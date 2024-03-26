@@ -1,0 +1,85 @@
+POST  http://localhost:5000/users
+Content-Type: application/json
+
+{
+      "name": "bimouser",
+    "email": "user@gmail.com",
+    "password": "12345",
+    "confPassword":"12345",
+    "role":"admin"
+}
+
+###
+GET http://localhost:5000/karyawan/
+
+###
+POST  http://localhost:5000/cabang
+Content-Type: application/json
+
+{
+"kode_cabang": "02",
+"nama_cabang": "testcabang",
+"lokasi_kantor": "-00212123,-123421",
+"radius": "100"
+}
+
+###
+POST  http://localhost:5000/karyawan/
+Content-Type: application/json
+
+{
+            "nik":"1234567890",
+            "nama_lengkap" : "testkaryawanbaru",
+            "jabatan" : "test",
+            "DepartmentId": "1",
+            "CabangId": "2",
+            "no_telp": "1234567890",
+            "avatar": "",
+            "password": "test123"
+}
+
+###
+DELETE http://localhost:5000/karyawan/2
+
+###
+POST http://localhost:5000/department
+Content-Type: application/json
+
+{
+     "kode_department": "111",
+      "nama_department": "test"
+}
+###
+GET http://localhost:5000/department/1
+
+
+###
+GET  http://localhost:5000/cabang
+
+###
+GET  http://localhost:5000/admin/jamKerja
+
+###
+POST  http://localhost:5000/admin/jamKerja
+Content-Type: application/json
+
+{
+      "kode_jamKerja" : "01",
+      "nama_jamKerja" : "Test",
+      "awal_jamMasuk" : "00.00",
+      "set_jamMasuk" : "01.00",
+      "akhir_jamMasuk" : "07.00",
+      "set_jamPulang" : "15.00"
+}
+
+###
+POST  http://localhost:5000/set
+Content-Type: application/json
+
+{
+    
+    "karyawan_id": 7,
+    "jam_id": "1",
+    "hari": "senin"
+}
+
