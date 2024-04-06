@@ -24,4 +24,4 @@ const Jam = db.define('Jam', {
     }
   });
 
-  export default Jam
+  export default Jam;

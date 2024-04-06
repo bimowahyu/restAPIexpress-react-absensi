@@ -3,26 +3,51 @@ import Karyawan from '../models/Karyawan.js';
 import Jam from '../models/Jam.js';
 
 
+// export const getJamByIdForKaryawan = async (req, res) => {
+//     try {
+//         const { karyawanId } = req.params;
+
+//         const jamData = await JamById.findAll({
+//             where: { karyawan_id: karyawanId },
+//             include: [{ model: Jam, as: 'jamDetail' }] // Menggunakan alias 'jamDetail' yang telah ditentukan di model
+//         });
+
+//         if (!jamData || jamData.length === 0) {
+//             return res.status(404).json({ msg: "Data jam tidak ditemukan" });
+//         }
+
+//         res.status(200).json({ data: jamData });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ msg: "Internal server error" });
+//     }
+// };
+// 
 export const getJamByIdForKaryawan = async (req, res) => {
-try {
-    const { karyawanId } = req.params;
+    try {
+        const { karyawanId } = req.params;
 
-    const jamData = await JamById.findAll({where: {karyawan_id: karyawanId}});
+        const jamData = await JamById.findAll({
+            where: { karyawan_id: karyawanId },
+            include: [{ 
+                model: Jam, 
+                as: 'jamDetail', // Pastikan alias 'jamDetail' sudah didefinisikan
+                attributes: ['id', 'name', 'hari', /* tambahkan kolom 'hari' di sini */] // Termasuk kolom "hari" di sini
+            }]
+        });
 
-    if(!jamData || jamData.length === 0 ){
-        return res.status(404).json({msg: "jam data tidak ada"})
-    }
-    res.status(200).json({data: jamData})
-    
+        if (!jamData || jamData.length === 0) {
+            return res.status(404).json({ msg: "Data jam tidak ditemukan" });
+        }
+
+        res.status(200).json({ data: jamData });
     } catch (error) {
-    console.log(error);
-    res.status(500).json({msg: "internal server error"});
-
-    
+        console.error(error);
+        res.status(500).json({ msg: "Internal server error" });
     }
 };
 
-// 
+
 export const setJamById = async (req, res) => {
     try {
         const { karyawan_id, jam_id, hari } = req.body; // Tangkap karyawan_id, jam_id, dan hari dari req.body
@@ -44,7 +69,40 @@ export const setJamById = async (req, res) => {
     }
 };
 
+export const addWorkDaysToEmployee = async (req, res) => {
+    try {
+        const { karyawan_id, jam_id, hari } = req.body;
+
+        // Pastikan hari adalah string tunggal
+        if (typeof hari !== 'string') {
+            return res.status(400).json({ msg: 'Hari harus berupa string tunggal' });
+        }
+
+        // Buat entri baru di model JamById
+        const newWorkDay = await JamById.create({ karyawan_id, jam_id, hari });
+
+        res.status(201).json({ msg: 'Hari kerja berhasil ditambahkan', data: newWorkDay });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
+
 
 export const updateJamById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { karyawan_id, jam_id, hari } = req.body;
+        const jamData = await JamById.findByPk(id);
+        
+        if (!jamData) {
+            return res.status(404).json({ msg: 'Data JamById tidak ditemukan' });
+        }
 
-}
+        const update = await jamData.update({ karyawan_id, jam_id, hari });
+        res.status(200).json({ msg: 'Data JamById berhasil diupdate' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};

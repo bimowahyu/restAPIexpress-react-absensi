@@ -2,7 +2,7 @@
 import Karyawan from '../models/Karyawan.js';
 import Department from '../models/Department.js';
 import Cabang from '../models/Cabang.js';
-import bcrypt from 'bcrypt';
+import argon2 from "argon2";
 import { writeFile } from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -68,7 +68,7 @@ export const createKaryawan = async (req, res) => {
             await writeFile(`public/uploads/karyawan/${avatar}`, req.file.buffer);
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await argon2.hash(password);
 
         const createData = await Karyawan.create({
             nik,
@@ -104,7 +104,7 @@ export const updateKaryawan = async (req, res) => {
             await writeFile(`public/uploads/karyawan/${avatar}`, req.file.buffer);
         }
 
-        const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+        const hashedPassword = password ? await argon2.hash(password, 10) : undefined;
 
         const updateData = await Karyawan.update({
             nik,

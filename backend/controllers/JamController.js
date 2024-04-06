@@ -35,18 +35,27 @@ export const createJam = async (req, res) => {
 export const updateJam = async (req, res) => {
     try {
         const { id } = req.params;
-        const update = await Jam.findByIdAndUpdate(id, req.body);
-        if (update) {
-            res.status(200).json({msg:'Jam Kerja berhasil diupdate'});
-        } else {
-            res.status(404).json({msg: 'Jam Kerja gagal diupdate, cek kembali'});
+        const { nama_jamKerja, awal_jamMasuk, set_jamMasuk, akhir_jamMasuk, set_jamPulang } = req.body;
+        const jam = await Jam.findByPk(id);
+        
+        if (!jam) {
+            return res.status(404).json({ msg: 'Jam Kerja tidak ditemukan' });
         }
+
+        const update = await jam.update({
+            nama_jamKerja,
+            awal_jamMasuk,
+            set_jamMasuk,
+            akhir_jamMasuk,
+            set_jamPulang
+        });
+
+        res.status(200).json({ msg: 'Jam Kerja berhasil diupdate' });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 };
-
 // Handler untuk menghapus jam kerja
 export const destroy = async (req, res) => {
     try {

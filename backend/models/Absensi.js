@@ -7,7 +7,7 @@ const {DataTypes} = Sequelize;
 
 const Absensi = db.define('Absensi',{
     tgl_absensi: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true
       },
       jam_masuk: {
@@ -35,7 +35,8 @@ const Absensi = db.define('Absensi',{
         allowNull: true
       }
 });
-Absensi.belongsTo(Karyawan);
-Absensi.belongsTo(Jam);
-
+// Absensi.belongsTo(Karyawan);
+Absensi.belongsTo(Karyawan, { foreignKey: 'karyawan_id', as: 'karyawan' });
+// Absensi.belongsTo(Jam);
+Absensi.belongsTo(Jam, { foreignKey: 'jam_id', as: 'jamDetail' });
 export default Absensi;

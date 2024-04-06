@@ -1,7 +1,10 @@
 import express from "express";
 import fileUpload from "express-fileupload";
 import db from "./config/DataBase.js";
+import moment from 'moment-timezone';
+//import cors from 'cors';
 import dotenv from "dotenv";
+import SequelizeStore from "connect-session-sequelize";
 import UserRoutes from "./routes/UserRoutes.js";
 import JamByIdRoutes from"./routes/JamByIdRoutes.js";
 import AbsensiRoutes from "./routes/AbsensiRoutes.js"
@@ -11,20 +14,41 @@ import IzinRoutes from "./routes/IzinRoutes.js"
 import JamRoutes from "./routes/JamRoutes.js"
 import KaryawanRoutes from "./routes/KaryawanRoutes.js"
 import DepartmentRoutes from "./routes/DepartmentRoutes.js"
+import AuthRoutes from "./routes/AuthRoutes.js"
+import AuthAdminRoutes from "./routes/AuthAdminRoutes.js"
+import session from "express-session";
 
 dotenv.config();
 
 const app = express();
 
-// (async () => {
-//     try {
-//         await db.sync();
-//         console.log("Database synced successfully");
-//     } catch (error) {
-//         console.error("Error syncing database:", error);
-//         process.exit(1); // Exit the process if sync fails
-//     }
+ 
+const sessionStore = SequelizeStore(session.Store);
+
+const store = new sessionStore({
+    db: db
+});
+
+// (async()=>{
+//    await db.sync();
 // })();
+
+app.use(session({
+    secret: process.env.SESS_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: store,
+  
+    cookie: {
+        secure: 'auto'
+    }
+}));
+
+app.use((req, res, next) => {
+    res.setHeader('Date', moment().tz('Asia/Jakarta').format('ddd, DD MMM YYYY HH:mm:ss [GMT+0700]'));
+    next();
+});
+
 
 app.use(express.json());
 app.use(UserRoutes);
@@ -36,9 +60,18 @@ app.use(IzinRoutes);
 app.use(JamRoutes);
 app.use(KaryawanRoutes);
 app.use(DepartmentRoutes);
+app.use(AuthRoutes);
+app.use(AuthAdminRoutes);
 
-
+// store.sync();
 // const PORT = process.env.APP_PORT || 3000;
+process.env.TZ = process.env.TIMEZONE;
+
+// Endpoint untuk mendapatkan waktu saat ini dalam zona waktu Asia/Jakarta
+app.get('/current-time', (req, res) => {
+    const currentTime = res.locals.moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
+    res.send(`Current time in GMT+7 is: ${currentTime}`);
+});
 
 app.listen(process.env.APP_PORT, ()=> {console.log('test server');});
  export default app

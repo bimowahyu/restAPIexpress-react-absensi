@@ -28,23 +28,37 @@ export const getCabangById = async (req, res) => {
 }
 
 // Handler untuk menambahkan cabang baru
-export const createCabang = async (req, res) => {
-    const{kode_cabang, nama_cabang, lokasi_kantor, radius} = req.body;
-   try {
-       await Cabang.create({
-        kode_cabang: kode_cabang,
-        nama_cabang: nama_cabang,
-        lokasi_kantor: lokasi_kantor,
-        radius: radius
-       });
-       res.status(201).json({msg: "cabang berhasil di tambahkan"});
+// export const createCabang = async (req, res) => {
+//     const{kode_cabang, nama_cabang, lokasi_kantor, radius} = req.body;
+//    try {
+//        await Cabang.create({
+//         kode_cabang: kode_cabang,
+//         nama_cabang: nama_cabang,
+//         lokasi_kantor: lokasi_kantor,
+//         radius: radius
+//        });
+//        res.status(201).json({msg: "cabang berhasil di tambahkan"});
 
-   } catch (error) {
-    res.status(400).json({msg: error.message});
-   }
+//    } catch (error) {
+//     res.status(400).json({msg: error.message});
+//    }
+// };
+export const createCabang = async (req, res) => {
+    const { kode_cabang, nama_cabang, latitude, longitude, radius } = req.body;
+    try {
+        await Cabang.create({
+            kode_cabang: kode_cabang,
+            nama_cabang: nama_cabang,
+            lokasi_kantor: `${latitude},${longitude}`, // Simpan latitude dan longitude
+            radius: radius
+        });
+        res.status(201).json({ msg: "Cabang berhasil ditambahkan" });
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
 };
 
-// Handler untuk memperbarui data cabang
+
 // Handler untuk memperbarui data cabang
 export const updateCabang = async (req, res) => {
     try {
@@ -66,15 +80,18 @@ export const updateCabang = async (req, res) => {
 
 // Handler untuk menghapus cabang
 export const destroyCabang = async (req, res) => {
-   // const { id } = req.params;
     try {
-        const cabang = await Cabang.findOne();
+        const cabang = await Cabang.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
         if (!cabang) {
-            return res.redirect('404').json({msg: "Cabang tidak ditemukan"});
+            return res.status(404).json({ msg: "Cabang tidak ditemukan" });
         }
         await cabang.destroy();
-        res.redirect('201').json({msg: "Cabang berhasil dihapus"});
+        res.status(200).json({ msg: "Cabang berhasil dihapus" });
     } catch (error) {
-        res.redirect('500').with({msg: "Gagal menghapus cabang, cek kembali"});
+        res.status(500).json({ msg: "Gagal menghapus cabang, cek kembali" });
     }
 };

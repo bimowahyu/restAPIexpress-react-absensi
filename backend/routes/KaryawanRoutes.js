@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { GetKaryawan, getKaryawanByid, createKaryawan, updateKaryawan, destroyKaryawan } from "../controllers/KaryawanController.js";
+//import {} from "../middleware/AbsensiMiddleware.js"
 
 // Routes untuk menampilkan daftar karyawan
 router.get('/karyawan', GetKaryawan);

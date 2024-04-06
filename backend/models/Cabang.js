@@ -11,7 +11,9 @@ const Cabang = db.define('Cabang',{
         type: DataTypes.STRING
       },
       lokasi_kantor: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING, // Pastikan tipe data sesuai
+        allowNull: false, // Atau sesuaikan dengan preferensi Anda
+        defaultValue: ''
       },
       radius: {
         type: DataTypes.INTEGER

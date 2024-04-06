@@ -3,7 +3,7 @@ import db from '../config/DataBase.js';
 import Jam from './Jam.js'; 
 import Karyawan from './Karyawan.js';
 
-const {DataTypes} = Sequelize;
+const { DataTypes } = Sequelize;
 
 const JamById = db.define('JamById', {
   id: {
@@ -20,17 +20,15 @@ const JamById = db.define('JamById', {
     allowNull: false
   },
   hari: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING, // Sesuaikan dengan tipe data yang benar
     allowNull: false
   }
 });
 
 // Definisi hubungan dengan model Karyawan
-JamById.belongsTo(Karyawan)
- // , { foreignKey: 'karyawan_id', as: 'karyawan' });
+JamById.belongsTo(Karyawan, { foreignKey: 'karyawan_id', as: 'karyawan' });
 
 // Definisi hubungan dengan model Jam
-JamById.belongsTo(Jam)
- // , { foreignKey: 'jam_id', as: 'jamDetail' });
+JamById.belongsTo(Jam, { foreignKey: 'jam_id', as: 'jamDetail' });
 
 export default JamById;

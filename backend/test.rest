@@ -10,36 +10,46 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5000/karyawan/
+GET http://localhost:5000/karyawan/9
+
 
 ###
-POST  http://localhost:5000/cabang
+POST http://localhost:5000/cabang
+Content-Type: application/json
+
+{
+    "kode_cabang": "02",
+    "nama_cabang": "testcabang",
+    "latitude": -7.0036053,
+    "longitude": 110.4515652,
+    "radius": 100
+}
+
+###
+PUT http://localhost:5000/cabang/3
 Content-Type: application/json
 
 {
 "kode_cabang": "02",
 "nama_cabang": "testcabang",
-"lokasi_kantor": "-00212123,-123421",
+"lokasi_kantor": "-7.0036053,110.4515652",
 "radius": "100"
 }
 
 ###
-POST  http://localhost:5000/karyawan/
+GET  http://localhost:5000/cabang
+
+###
+PUT  http://localhost:5000/cabang/2
 Content-Type: application/json
 
 {
-            "nik":"1234567890",
-            "nama_lengkap" : "testkaryawanbaru",
-            "jabatan" : "test",
-            "DepartmentId": "1",
-            "CabangId": "2",
-            "no_telp": "1234567890",
-            "avatar": "",
-            "password": "test123"
+    "kode_cabang": "02",
+    "nama_cabang": "Cabang Baru",
+    "latitude": "-7.0036053",
+    "longitude": "110.4515652",
+    "radius": 100
 }
-
-###
-DELETE http://localhost:5000/karyawan/2
 
 ###
 POST http://localhost:5000/department
@@ -49,6 +59,43 @@ Content-Type: application/json
      "kode_department": "111",
       "nama_department": "test"
 }
+
+
+###
+POST  http://localhost:5000/karyawan/
+Content-Type: application/json
+
+{
+            "nik":"1111111111",
+            "nama_lengkap" : "testjammasukkeluar",
+            "jabatan" : "test",
+            "DepartmentId": "1",
+            "CabangId": "2",
+            "no_telp": "1234567890",
+            "avatar": "",
+            "password": "test123"
+}
+
+
+
+###
+PUT  http://localhost:5000/karyawan/2
+Content-Type: application/json
+
+{
+            "nik":"2222222222",
+            "nama_lengkap" : "testjammasukkeluar",
+            "jabatan" : "test",
+            "DepartmentId": 1,
+            "CabangId": 2,
+            "no_telp": "1234567890",
+            "avatar": "",
+            "password": "test123"
+}
+###
+GET  http://localhost:5000/karyawan/1
+
+
 ###
 GET http://localhost:5000/department/1
 
@@ -66,10 +113,23 @@ Content-Type: application/json
 {
       "kode_jamKerja" : "01",
       "nama_jamKerja" : "Test",
-      "awal_jamMasuk" : "00.00",
-      "set_jamMasuk" : "01.00",
-      "akhir_jamMasuk" : "07.00",
-      "set_jamPulang" : "15.00"
+      "awal_jamMasuk" : "00:00:00",
+      "set_jamMasuk" : "01:00:00",
+      "akhir_jamMasuk" : "07:00:00",
+      "set_jamPulang" : "15:00:00"
+}
+
+###
+PUT  http://localhost:5000/admin/jamKerja/1
+Content-Type: application/json
+
+{
+      "kode_jamKerja" : "01",
+      "nama_jamKerja" : "Test",
+      "awal_jamMasuk" : "00:00:00",
+      "set_jamMasuk" : "01:00:00",
+      "akhir_jamMasuk" : "23:58:00",
+      "set_jamPulang" : "23:59:00"
 }
 
 ###
@@ -78,8 +138,138 @@ Content-Type: application/json
 
 {
     
-    "karyawan_id": 7,
-    "jam_id": "1",
-    "hari": "senin"
+    "karyawan_id": 2,
+    "jam_id": "2",
+    "hari": "selasa"
 }
 
+###
+POST http://localhost:5000/sethari
+Content-Type: application/json
+
+{
+    
+    "karyawan_id": 2,
+    "jam_id": "2",
+    "hari": "jumat"
+
+}
+
+###
+POST  http://localhost:5000/izin
+Content-Type: application/json
+
+{
+    
+    "tgl_izin": "2024-03-24",
+    "status": "i",
+    "keterangan": "test",
+    "status_approved":"0",
+    "foto":"",
+    "KaryawanId":"1"
+
+}
+
+###
+POST http://localhost:5000/loginAdmin
+Content-Type: application/json
+
+{
+      "email": "user@gmail.com",
+      "password": "12345"
+}
+
+###
+GET  http://localhost:5000/Me
+
+###
+DELETE http://localhost:5000/logout
+
+
+###
+POST http://localhost:5000/loginKaryawan
+Content-Type: application/json
+
+{
+      "nik": "2222222222",
+      "password": "test123"
+}
+
+###
+POST http://localhost:5000/loginKaryawan
+Content-Type: application/json
+
+{
+      "nik": "2222222222",
+      "password": "test123"
+}
+
+
+
+###
+GET http://localhost:5000/MeKaryawan
+
+###
+DELETE  http://localhost:5000/logoutKaryawan
+
+
+###
+POST http://localhost:5000/absensi/karyawan/create
+Content-Type: application/json
+
+{
+   
+   "latitude": -7.0036053,
+    "longitude": 110.4515652,
+   "image": "data:image/png;base64,iVBORw"
+} 
+
+###
+GET  http://localhost:5000/absensi/get
+
+
+###
+PUT  http://localhost:5000/absensi/karyawan/keluar
+Content-Type: application/json
+
+{
+   
+   "latitude": -7.003053,
+   "longitude": 110.4515652,
+   "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAABqUlEQVR4nGNgGAWjYBSMglEw1ZIExUQtQJL"
+
+}
+
+###
+POST  http://localhost:5000/absensi/karyawan/create
+Content-Type: application/json
+
+{
+    "latitude": -7.0036053,
+    "longitude": 110.4515652,
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAABqUlEQVR4nGNgGAWjYBSMglEw1ZIExUQtQJL"
+}
+//keluar
+###
+PUT http://localhost:5000/absensi/karyawan/keluar
+Content-Type: application/json
+
+{
+  
+   
+   "latitude": -7.0036053,
+    "longitude": 110.4515652,
+   "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAABqUlEQVR4nGNgGAWjYBSMglEw1ZIExUQtQJL"
+}
+
+
+
+###
+POST  http://localhost:5000/absensibulanini/get
+Content-Type: application/json
+
+{
+    "karyawan_id": 2,
+     "bulan": "04",
+    "tahun": "2024"
+}

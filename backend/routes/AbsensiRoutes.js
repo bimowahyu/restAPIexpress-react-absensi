@@ -1,12 +1,23 @@
 import express from 'express';
-import { getHari, getAbsensi, CreateAbsensiKaryawan, edit, updateKaryawan } from '../controllers/AbsensiController.js';
+import { 
+    getAbsensiBulanIni, 
+   getAbsensi, 
+   CreateAbsensiKaryawan,
+   CreateAbsensiKaryawanKeluar, 
+    edit, 
+   updateKaryawan 
+} from '../controllers/AbsensiController.js';
+import { authKaryawan } from "../middleware/AbsensiMiddleware.js" 
 
 const router = express.Router();
 
-router.get('/absensi/create', getAbsensi);
-router.post('/absensi/karyawan/create', CreateAbsensiKaryawan);
+router.post('/absensibulanini/get',authKaryawan, getAbsensiBulanIni);
+router.get('/absensi/get', authKaryawan, getAbsensi);
+router.put('/absensi/karyawan/keluar', authKaryawan ,CreateAbsensiKaryawanKeluar);
+router.post('/absensi/karyawan/create', authKaryawan ,CreateAbsensiKaryawan);
+router.post('/absensi/karyawan/keluar', authKaryawan ,CreateAbsensiKaryawan);
 router.get('/absensi/:id/edit', edit);
-router.get('/absensi/', getHari);
+//router.get('/absensi/', getHari);
 router.put('/absensi/:id', updateKaryawan);
 
 export default router;

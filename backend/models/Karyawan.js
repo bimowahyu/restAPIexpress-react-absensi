@@ -32,6 +32,6 @@ const Karyawan = db.define('Karyawan', {
   });
   Karyawan.belongsTo(Department);
   Karyawan.belongsTo(Cabang);
-  //Karyawan.hasMany(JamById, { foreignKey: 'karyawan_id', as: 'jamDetail' });
+ // Karyawan.hasMany(JamById, { foreignKey: 'karyawan_id', as: 'jamDetail' });
 
   export default Karyawan;
