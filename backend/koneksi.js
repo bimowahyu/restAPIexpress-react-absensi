@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import fileUpload from "express-fileupload";
 import db from "./config/DataBase.js";
 import moment from 'moment-timezone';
@@ -17,6 +18,7 @@ import DepartmentRoutes from "./routes/DepartmentRoutes.js"
 import AuthRoutes from "./routes/AuthRoutes.js"
 import AuthAdminRoutes from "./routes/AuthAdminRoutes.js"
 import session from "express-session";
+
 
 dotenv.config();
 
@@ -49,6 +51,11 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(cors({
+    credentials: true,
+    origin:'http://localhost:5000'
+
+}));
 
 app.use(express.json());
 app.use(UserRoutes);

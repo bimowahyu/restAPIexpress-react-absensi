@@ -1,5 +1,6 @@
 import express from 'express';
 import { 
+    getAbsensiTotal,
     getAbsensiBulanIni, 
    getAbsensi, 
    CreateAbsensiKaryawan,
@@ -11,7 +12,8 @@ import { authKaryawan } from "../middleware/AbsensiMiddleware.js"
 
 const router = express.Router();
 
-router.post('/absensibulanini/get',authKaryawan, getAbsensiBulanIni);
+router.get('/absensitotal/get', authKaryawan, getAbsensiTotal);
+router.get('/absensibulanini/get',authKaryawan, getAbsensiBulanIni);
 router.get('/absensi/get', authKaryawan, getAbsensi);
 router.put('/absensi/karyawan/keluar', authKaryawan ,CreateAbsensiKaryawanKeluar);
 router.post('/absensi/karyawan/create', authKaryawan ,CreateAbsensiKaryawan);

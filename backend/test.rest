@@ -191,7 +191,7 @@ POST http://localhost:5000/loginKaryawan
 Content-Type: application/json
 
 {
-      "nik": "2222222222",
+      "nik": "1111111111",
       "password": "test123"
 }
 
@@ -265,11 +265,10 @@ Content-Type: application/json
 
 
 ###
-POST  http://localhost:5000/absensibulanini/get
-Content-Type: application/json
+GET http://localhost:5000/absensibulanini/get?bulan=04&tahun=2024
 
-{
-    "karyawan_id": 2,
-     "bulan": "04",
-    "tahun": "2024"
-}
+
+
+###
+GET  http://localhost:5000/absensitotal/get?bulan=04&tahun=2024
+

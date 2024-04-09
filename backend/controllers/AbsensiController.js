@@ -7,7 +7,7 @@ import { writeFile } from 'fs/promises';
 import { Op, where } from 'sequelize';
 import dayjs from 'dayjs';
 import { startOfDay, endOfDay } from 'date-fns';
-import moment from 'moment-timezone';
+import moment from 'moment';
 
 
 import argon2 from "argon2";
@@ -22,7 +22,7 @@ const currentDay = daysOfWeek[dayIndex];
 // dayjs.extend(require('dayjs/plugin/timezone.js')); // Load plugin timezone
 export const getAbsensi = async (req, res) => {
     try {
-        const hariIni = new Date().toISOString().slice(0, 10);
+        const hariIni =  moment().tz('Asia/Jakarta').format('YYYY-MM-DD');//new Date().toISOString().slice(0, 10);
         const karyawanId = req.karyawan.id; // Menggunakan req.karyawan.id
         const karyawan = await Karyawan.findByPk(karyawanId); // Menggunakan await untuk mendapatkan karyawan berdasarkan ID
 
@@ -45,27 +45,110 @@ export const getAbsensi = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-export const getAbsensiBulanIni = async (req,res) =>{
+
+// export const getAbsensiByKaryawanId = async (req, res) => {
+//     try {
+//         const karyawanId = req.karyawanId; // Ambil ID karyawan dari parameter route
+        
+//         // Cari data absensi berdasarkan ID karyawan
+//         const absensiKaryawan = await Absensi.findAll({
+//             where: {
+//                 karyawan_id: karyawanId
+//             }
+//         });
+
+//         // Mengirimkan data absensi karyawan dalam format JSON sebagai respons
+//         res.status(200).json(absensiKaryawan);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// };
+
+
+export const getAbsensiBulanIni = async (req, res) => {
     try {   
         const bulan = req.query.bulan;
         const tahun = req.query.tahun;
-        const tanggalMulai = `${bulan}-${tahun}-01`;
-        const tanggalSelesai = `${bulan}-${tahun}-30`;
-        const absensiBulanan = await Absensi.findAndCountAll({
-            where:{ karyawan_id : req.karyawan.id,
+
+        // Menggunakan moment.js untuk memastikan tanggal yang valid
+        const tanggalMulai = moment(`${tahun}-${bulan}-01`).format('YYYY-MM-DD');
+        const tanggalSelesai = moment(`${tahun}-${bulan}-30`).format('YYYY-MM-DD');
+
+        // Mendapatkan semua data absensi untuk bulan dan tahun yang ditentukan
+        const absensiBulanan = await Absensi.findAll({
+            where: {
                 tgl_absensi: {
-                    [Op.between] : [tanggalMulai, tanggalSelesai]
+                    [Op.between]: [tanggalMulai, tanggalSelesai]
                 }
             }
         });
-        const totalKehadiran =  absensiBulanan.count; 
-        res.status(200).json({totalKehadiran});
 
+        // Membuat objek untuk menyimpan data absensi per karyawan
+        const dataAbsensi = {};
+
+        // Mengelompokkan data absensi berdasarkan karyawan
+        absensiBulanan.forEach(absensi => {
+            const karyawanId = absensi.karyawan_id;
+            if (!dataAbsensi[karyawanId]) {
+                dataAbsensi[karyawanId] = []; // Inisialisasi array jika belum ada
+            }
+            // Menambahkan data absensi ke dalam array
+            dataAbsensi[karyawanId].push({
+                tanggal: absensi.tgl_absensi,
+                jam_masuk: absensi.jam_masuk,
+                jam_keluar: absensi.jam_keluar,
+                lokasi_masuk: absensi.lokasi_masuk,
+                lokasi_keluar: absensi.lokasi_keluar
+            });
+        });
+
+        // Mengirimkan data absensi dalam format yang diinginkan
+        res.status(200).json(dataAbsensi);
     } catch (error) {
-         console.error(error);
+        console.error(error);
         res.status(500).send('Internal Server Error');
     }
 }
+
+export const getAbsensiTotal = async (req, res) => {
+    try {   
+        const bulan = req.query.bulan;
+        const tahun = req.query.tahun;
+
+        // Menggunakan moment.js untuk memastikan tanggal yang valid
+        const tanggalMulai = moment(`${tahun}-${bulan}-01`).format('YYYY-MM-DD');
+        const tanggalSelesai = moment(`${tahun}-${bulan}-30`).format('YYYY-MM-DD');
+
+        // Mendapatkan semua data absensi untuk bulan dan tahun yang ditentukan
+        const absensiBulanan = await Absensi.findAll({
+            where: {
+                tgl_absensi: {
+                    [Op.between]: [tanggalMulai, tanggalSelesai]
+                }
+            }
+        });
+
+        // Membuat objek untuk menyimpan jumlah kehadiran setiap karyawan
+        const kehadiranKaryawan = {};
+
+        // Menghitung jumlah kehadiran setiap karyawan
+        absensiBulanan.forEach(absensi => {
+            const karyawanId = absensi.karyawan_id;
+            if (!kehadiranKaryawan[karyawanId]) {
+                kehadiranKaryawan[karyawanId] = 1; // Jika belum ada, inisialisasi dengan 1
+            } else {
+                kehadiranKaryawan[karyawanId]++; // Jika sudah ada, tambahkan 1
+            }
+        });
+
+        // Mengirimkan data kehadiran dalam format yang diinginkan
+        res.status(200).json(kehadiranKaryawan);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 function convertToGMT7(dateString) {
     return moment.utc(dateString).tz('Asia/Jakarta').format(); // Mengubah ke zona waktu Asia/Jakarta (GMT+7)
@@ -94,17 +177,35 @@ export const CreateAbsensiKaryawan = async (req, res) => {
             return res.status(400).json({ msg: "ID cabang tidak valid" });
         }
         
-         const tglAbsensi = new Date().toISOString().slice(0, 10);
-        //  const tglAbsensi = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
+        // const tglAbsensi = new Date().toISOString().slice(0, 10);
+         const tglAbsensi = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
         //const tglAbsensi = dayjs().format('YYYY-MM-DD');
         // const tglAbsensi = req.body;
 
 
         // Periksa apakah sudah ada absensi masuk untuk karyawan pada hari yang sama
-        const existingAbsensi = await Absensi.findOne({ where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id } });
+        // const existingAbsensi = await Absensi.findOne({ where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id } });
 
+        // if (existingAbsensi) {
+        //     return res.status(400).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+        // }
+        const existingAbsensi = await Absensi.findOne({ 
+            where: { 
+                tgl_absensi: tglAbsensi, // Tanggal absensi pada database
+                karyawan_id: karyawan.id 
+            } 
+        });
+        
         if (existingAbsensi) {
-            return res.status(400).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+            // Mengambil tanggal hari ini dengan timezone GMT+7
+            const todayDate = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');//new Date().toISOString().slice(0, 10);
+            
+            // Mengambil tanggal absensi terakhir dengan timezone GMT+7
+            const lastAbsensiDate = moment(existingAbsensi.tgl_absensi).tz('Asia/Jakarta').format('YYYY-MM-DD');//slice(0, 10);
+            
+            if (todayDate === lastAbsensiDate) {
+                return res.status(400).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+            }
         }
 
         const lokasiKantor = await Cabang.findOne({ where: { id: cabangId } });
@@ -137,6 +238,10 @@ export const CreateAbsensiKaryawan = async (req, res) => {
 
           const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
 
+          if (jam < jamKerja.jamDetail.awal_jamMasuk || jam > jamKerja.jamDetail.akhir_jamMasuk) {
+            return res.status(400).send("Maaf, belum waktunya melakukan absensi masuk atau Anda sudah melewati batas waktu absensi masuk.");
+        }
+
         // const currentTime = new Date().toLocaleTimeString("en-US", { hour12: false });
         // if (currentTime < jamKerja.awal_jamMasuk || currentTime > jamKerja.akhir_jamMasuk) {
         //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar atau Anda sudah melewati batas waktu absensi keluar");
@@ -155,7 +260,7 @@ export const CreateAbsensiKaryawan = async (req, res) => {
         if (radius > lokasiKantor.radius) {
             return res.status(400).send(`Maaf, Anda berada di luar radius kantor. Jarak Anda ${radius} meter dari kantor`);
         }
-
+       
         const dataMasuk = {
             karyawan_id: karyawan.id,
             jam_id: jamKerja.jam_id,
@@ -176,7 +281,8 @@ export const CreateAbsensiKaryawan = async (req, res) => {
             return res.status(200).send("Absensi berhasil, Selamat bekerja");
         } else {
             return res.status(500).send("Error saat menyimpan data absensi");
-        }
+        }  
+    
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -198,14 +304,33 @@ export const CreateAbsensiKaryawanKeluar = async (req, res) => {
             return res.status(400).json({ msg: "ID cabang tidak valid" });
         }
         // Ambil tanggal hari ini
-        // const tglAbsensi = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
+        const tglAbsensi = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
         // const tglAbsensi = dayjs().format('YYYY-MM-DD');
-        const tglAbsensi = new Date().toISOString().slice(0, 10);
+        //const tglAbsensi = new Date().toISOString().slice(0, 10);
         // Periksa apakah sudah ada absensi keluar untuk karyawan pada hari yang sama
-        const existingAbsensi = await Absensi.findOne({ where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id, jam_keluar: { [Op.ne]: null } } });
+        // const existingAbsensi = await Absensi.findOne({ where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id, jam_keluar: { [Op.ne]: null } } });
 
+        // if (existingAbsensi) {
+        //     return res.status(400).send("Anda sudah melakukan absen keluar hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+        // }
+        const existingAbsensi = await Absensi.findOne({ 
+            where: { 
+                tgl_absensi: tglAbsensi, // Tanggal absensi pada database
+                karyawan_id: karyawan.id,
+                jam_keluar: { [Op.ne]: null } 
+            } 
+        });
+        
         if (existingAbsensi) {
-            return res.status(400).send("Anda sudah melakukan absen keluar hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+            // Mengambil tanggal hari ini dengan timezone GMT+7
+            const todayDate = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');//new Date().toISOString().slice(0, 10);//new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).slice(0, 10);
+            
+            // Mengambil tanggal absensi terakhir dengan timezone GMT+7
+            const lastAbsensiDate = moment(existingAbsensi.tgl_absensi).tz('Asia/Jakarta').format('YYYY-MM-DD');//existingAbsensi.tgl_absensi.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).slice(0, 10);
+            
+            if (todayDate === lastAbsensiDate) {
+                return res.status(400).send("Anda sudah melakukan absen keluar hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+            }
         }
         // const tglAbsensi = req.body;
         const lokasiKantor = await Cabang.findOne({ where: { id: cabangId } });
@@ -246,6 +371,11 @@ export const CreateAbsensiKaryawanKeluar = async (req, res) => {
         }
 
          const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
+
+         
+         if (jam < jamKerja.jamDetail.set_jamKeluar) {
+            return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
+        }
       
         //  const currentTime = new Date().toLocaleTimeString("en-US", { hour12: false });
         //  if (currentTime < jamKerja.awal_jamKeluar || currentTime > jamKerja.set_jamPulang) {
