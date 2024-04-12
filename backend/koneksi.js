@@ -3,7 +3,7 @@ import cors from "cors";
 import fileUpload from "express-fileupload";
 import db from "./config/DataBase.js";
 import moment from 'moment-timezone';
-//import cors from 'cors';
+import bodyParser from 'body-parser';
 import dotenv from "dotenv";
 import SequelizeStore from "connect-session-sequelize";
 import UserRoutes from "./routes/UserRoutes.js";
@@ -51,9 +51,12 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 app.use(cors({
     credentials: true,
-    origin:'http://localhost:5000'
+    origin:'http://localhost:3000'
 
 }));
 

@@ -11,7 +11,7 @@ import moment from 'moment';
 
 
 import argon2 from "argon2";
-import { Console } from "console";
+import { Console, error } from "console";
 
 const today = new Date();
 const dayIndex = today.getDay();
@@ -97,10 +97,15 @@ export const getAbsensiBulanIni = async (req, res) => {
             dataAbsensi[karyawanId].push({
                 tanggal: absensi.tgl_absensi,
                 jam_masuk: absensi.jam_masuk,
+                foto_masuk: absensi.foto_masuk,
+                foto_keluar:absensi.foto_keluar,
                 jam_keluar: absensi.jam_keluar,
                 lokasi_masuk: absensi.lokasi_masuk,
                 lokasi_keluar: absensi.lokasi_keluar
             });
+            if(!absensi.jam_keluar || !absensi.lokasi_keluar || !absensi.foto_keluar){
+               dataAbsensi[karyawanId].push({error: 'Anda belum absen keluar'})
+            }
         });
 
         // Mengirimkan data absensi dalam format yang diinginkan
@@ -204,7 +209,7 @@ export const CreateAbsensiKaryawan = async (req, res) => {
             const lastAbsensiDate = moment(existingAbsensi.tgl_absensi).tz('Asia/Jakarta').format('YYYY-MM-DD');//slice(0, 10);
             
             if (todayDate === lastAbsensiDate) {
-                return res.status(400).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
+                return res.status(402).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
             }
         }
 

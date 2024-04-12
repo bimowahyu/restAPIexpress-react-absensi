@@ -66,8 +66,8 @@ POST  http://localhost:5000/karyawan/
 Content-Type: application/json
 
 {
-            "nik":"1111111111",
-            "nama_lengkap" : "testjammasukkeluar",
+            "nik":"3333333333",
+            "nama_lengkap" : "testmidleware",
             "jabatan" : "test",
             "DepartmentId": "1",
             "CabangId": "2",
@@ -200,7 +200,7 @@ POST http://localhost:5000/loginKaryawan
 Content-Type: application/json
 
 {
-      "nik": "2222222222",
+      "nik": "1111111111",
       "password": "test123"
 }
 
@@ -250,6 +250,7 @@ Content-Type: application/json
     "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAABqUlEQVR4nGNgGAWjYBSMglEw1ZIExUQtQJL"
 }
 //keluar
+
 ###
 PUT http://localhost:5000/absensi/karyawan/keluar
 Content-Type: application/json

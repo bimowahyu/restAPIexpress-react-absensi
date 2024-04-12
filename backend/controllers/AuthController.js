@@ -71,3 +71,4 @@ export const logOutKaryawan = (req, res) =>{
         res.status(200).json({msg: "Anda telah logout"});
     });
 };
+
