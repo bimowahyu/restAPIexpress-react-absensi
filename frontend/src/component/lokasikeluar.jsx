@@ -1,26 +1,26 @@
 import React from 'react';
+import 'leaflet/dist/leaflet.css'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
-const LocationMap = ({ latitude, longitude }) => {
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}&layer=mapnik`;
+const LokasiKeluar = ({ latitude, longitude }) => {
+  if (latitude === null || longitude === null) {
+    return null; // Jangan render jika latitude atau longitude adalah null
+  }
 
   return (
-    <div>
-      <h2>Lokasi Anda</h2>
-      <iframe
-        title="Peta Lokasi"
-        width="200"
-        height="150"
-        frameBorder="0"
-        scrolling="no"
-        marginHeight="0"
-        marginWidth="0"
-        src={mapUrl}
-      ></iframe>
-    </div>
+    <MapContainer center={[latitude, longitude]} zoom={17} style={{  height: '300px', width: '300px' }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      <Marker position={[latitude, longitude]}>
+        <Popup>Your Location</Popup>
+      </Marker>
+    </MapContainer>
   );
 };
 
-export default LocationMap;
+export default LokasiKeluar;
 
 // import React, { useEffect, useState } from 'react';
 // import L from 'leaflet';

@@ -1,0 +1,67 @@
+/* CSS */
+.hamburger-menu {
+    display: block;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    left: 50px;
+    z-index: 1000;
+    transition: left 0.3s ease; /* Tambahkan transisi */
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    margin: 5px 0;
+}
+
+.menu {
+    position: fixed;
+    top: 0;
+    left: -200px; /* Sembunyikan sidebar saat ditutup */
+    transition: left 0.3s ease;
+    background-color: rgb(255, 255, 255); /* Warna latar belakang sidebar */
+}
+
+.menu.open {
+    left: 0; /* Tampilkan sidebar saat dibuka */
+    background-color: rgb(255, 255, 255); /* Warna latar belakang sidebar saat dibuka */
+}
+
+.clock-container {
+    display: flex;
+}
+
+.gambar{
+    display: block;
+    align-items: center;
+}
+.foto{
+    align-items: center;
+    position: relative;
+    left: 23rem;
+}
+
+.clock-container .clockin,
+.clock-container .clockout {
+    flex: 1;
+    margin-right: 20px;
+    padding-top: 200px; /* Jarak antara clockin dan clockout */
+}
+/* Tampilan di bawah 600px */
+@media screen and (max-width: 550px) {
+    .clock-container {
+        flex-direction: column; /* Mengubah tata letak menjadi vertikal */
+        align-items: center; /* Posisikan elemen di tengah secara horizontal */
+    }
+
+    .clock-container .clockin,
+    .clock-container .clockout {
+        flex: unset; /* Reset flex property */
+        margin-right: 0; /* Hapus margin */
+        margin-bottom: 20px;
+        padding-top: 40px; /* Tambahkan margin bottom agar terpisah */
+    }
+}
+/* CSS tambahan sesuai kebutuhan */

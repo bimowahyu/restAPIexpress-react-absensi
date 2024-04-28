@@ -50,7 +50,7 @@ export const MeKaryawan = async (req, res) => {
     }
     try {
         const karyawan = await Karyawan.findOne({
-            attributes: ['id', 'nama_lengkap', 'nik', 'jabatan', 'DepartmentId', 'CabangId'],
+            attributes: ['id', 'nama_lengkap', 'nik','no_telp','avatar', 'jabatan', 'DepartmentId', 'CabangId'],
             where: {
                 id: req.session.karyawanId
             }

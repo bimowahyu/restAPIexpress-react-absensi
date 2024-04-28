@@ -11,6 +11,9 @@ export const AdminOnly = async (req, res, next) => {
         if (!admin) {
             return res.status(404).json({ msg: "Akun admin tidak ditemukan" });
         }
+        if (admin.role !== 'admin') {
+            return res.status(403).json({ msg: "Anda tidak memiliki izin untuk melakukan operasi ini" });
+        }
         req.admin = admin;
         next();
     } catch (error) {

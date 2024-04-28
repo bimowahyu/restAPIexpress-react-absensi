@@ -13,8 +13,8 @@ import { AdminOnly } from '../middleware/AdminMiddleware.js';
 
 const router = express.Router();
 
-router.get('/absensitotal/get', authKaryawan, getAbsensiTotal);
-router.get('/absensibulanini/get',authKaryawan, getAbsensiBulanIni);
+router.get('/absensitotal/get', AdminOnly, getAbsensiTotal);
+router.get('/absensibulanini/get',AdminOnly, getAbsensiBulanIni);
 router.get('/absensi/get', authKaryawan, getAbsensi);
 router.put('/absensi/karyawan/keluar', authKaryawan ,CreateAbsensiKaryawanKeluar);
 router.post('/absensi/karyawan/create', authKaryawan ,CreateAbsensiKaryawan);

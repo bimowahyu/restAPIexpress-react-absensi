@@ -106,6 +106,9 @@ export const getAbsensiBulanIni = async (req, res) => {
             if(!absensi.jam_keluar || !absensi.lokasi_keluar || !absensi.foto_keluar){
                dataAbsensi[karyawanId].push({error: 'Anda belum absen keluar'})
             }
+            if(!absensi.jam_masuk || !absensi.lokasi_masuk || !absensi.foto_masuk){
+                dataAbsensi[karyawanId].push({error: 'Anda Tidak Presensi Hari ini'})
+             }
         });
 
         // Mengirimkan data absensi dalam format yang diinginkan
@@ -241,7 +244,8 @@ export const CreateAbsensiKaryawan = async (req, res) => {
             return res.status(400).send("Jam kerja tidak ditemukan");
         }
 
-          const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
+        //   const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
+        const jam = moment().format('HH:mm:ss');
 
           if (jam < jamKerja.jamDetail.awal_jamMasuk || jam > jamKerja.jamDetail.akhir_jamMasuk) {
             return res.status(400).send("Maaf, belum waktunya melakukan absensi masuk atau Anda sudah melewati batas waktu absensi masuk.");
@@ -338,6 +342,7 @@ export const CreateAbsensiKaryawanKeluar = async (req, res) => {
             }
         }
         // const tglAbsensi = req.body;
+        
         const lokasiKantor = await Cabang.findOne({ where: { id: cabangId } });
 
         if (!lokasiKantor || !lokasiKantor.lokasi_kantor) {
@@ -375,12 +380,30 @@ export const CreateAbsensiKaryawanKeluar = async (req, res) => {
             return res.status(400).send("Jam kerja tidak ditemukan");
         }
 
-         const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
+        //  const jam = new Date().toLocaleTimeString("en-US", { hour12: false });
+        // const jam = moment().format('HH:mm:ss');
+        const jam = moment(); // Menggunakan waktu saat ini sebagai objek moment
+        const jamKeluar = jam.format('YYYY-MM-DD HH:mm:ss');
+const setJamKeluar = moment(`${tglAbsensi} ${jamKerja.jamDetail.set_jamPulang}`, 'YYYY-MM-DD HH:mm:ss');
+if (jam.isBefore(setJamKeluar)) {
+    return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
+}
 
          
-         if (jam < jamKerja.jamDetail.set_jamKeluar) {
-            return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
-        }
+        //  if (jam > jamKerja.jamDetail.set_jamPulang) {
+        //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
+        // }
+        // console.log(jamKerja)
+        // if (jam < jamKerja.jamDetail.set_jamKeluar || jam < jamKerja.jamDetail.set_jamKeluar) {
+        //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar");
+        // }
+//                Periksa apakah sudah waktunya untuk absen keluar
+               // const jam = moment().format('HH:mm:ss');
+                // const setJamKeluar = moment(`${tglAbsensi} ${jamKerja.jamDetail.set_jamPulang}`, 'YYYY-MM-DD HH:mm:ss');
+                // if (jam.isBefore(setJamKeluar)) {
+                //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
+                // }
+        
       
         //  const currentTime = new Date().toLocaleTimeString("en-US", { hour12: false });
         //  if (currentTime < jamKerja.awal_jamKeluar || currentTime > jamKerja.set_jamPulang) {
@@ -390,13 +413,15 @@ export const CreateAbsensiKaryawanKeluar = async (req, res) => {
        const formatName = `${karyawan.nik}-${tglAbsensi}-keluar`;
        const [imageType, imageData] = req.body.image.split(";base64,");
        const file = `public/uploads/absensi/${formatName}.png`;
+
        if (radius > lokasiKantor.radius) {
         return res.status(400).send(`Maaf, Anda berada di luar radius kantor. Jarak Anda ${radius} meter dari kantor`);
     }
         // Update absensi keluar
         
         const update = await Absensi.update({ 
-            jam_keluar: jam,
+            // jam_keluar: jam,
+            jam_keluar: jamKeluar,
             foto_keluar: `${formatName}.png`,
             lokasi_keluar: lokasiKeluar//`${req.body.latitude},${req.body.longitude}`
         }, { where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id } });
