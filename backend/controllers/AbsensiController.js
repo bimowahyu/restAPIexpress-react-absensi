@@ -1,4 +1,5 @@
 import Absensi from "../models/Absensi.js";
+import izin from "../models/Izin.js"
 import Karyawan from "../models/Karyawan.js";
 import Cabang from "../models/Cabang.js";
 import JamById from "../models/JamById.js";
@@ -197,6 +198,16 @@ export const CreateAbsensiKaryawan = async (req, res) => {
         // if (existingAbsensi) {
         //     return res.status(400).send("Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.");
         // }
+        const approvedIzin = await izin.findOne({ 
+            where: { 
+                tgl_izin: tglAbsensi,
+                KaryawanId: karyawan.id,
+                status_approved: 'Disetujui'
+            } 
+        });
+        if (approvedIzin) {
+            return res.status(400).send("Anda telah memiliki izin yang disetujui pada hari ini.");
+        }
         const existingAbsensi = await Absensi.findOne({ 
             where: { 
                 tgl_absensi: tglAbsensi, // Tanggal absensi pada database

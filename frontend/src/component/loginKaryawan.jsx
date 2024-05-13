@@ -36,7 +36,7 @@ const LoginKaryawan = () => {
             <div className="column is-4">
               <form onSubmit={Auth} className="box">
                 {isError && <p className="has-text-centered">{message}</p>}
-                <h1 className="title is-2">Sign In</h1>
+                <h1 className="title is-2">Log In</h1>
                 <div className="field">
                   <label className="label">Nik</label>
                   <div className="control">

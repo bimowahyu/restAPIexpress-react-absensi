@@ -8,7 +8,8 @@ const {DataTypes} = Sequelize;
 
 const Karyawan = db.define('Karyawan', {
     nik: {
-      type: DataTypes.CHAR(16)
+      type: DataTypes.CHAR(16),
+      unique: true
     },
     nama_lengkap: {
       type: DataTypes.STRING
@@ -21,6 +22,10 @@ const Karyawan = db.define('Karyawan', {
     },
     avatar: {
       type: DataTypes.TEXT,
+      allowNull: true
+    },
+    url: {
+      type: DataTypes.STRING,
       allowNull: true
     },
     password: {

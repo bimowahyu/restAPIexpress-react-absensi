@@ -39,8 +39,15 @@ export const Login = async (req, res) => {
     }
 };
 
+// export const Me = async (req, res) => {
+//     if (!req.session.userId) {
+//         return res.status(401).json({ msg: "Mohon login ke akun Anda!" });
+//     }
 export const Me = async (req, res) => {
-    if (!req.session.userId) {
+    const currentTime = new Date().getTime();
+    const sessionExpire = new Date(req.session.cookie.expires).getTime();
+
+    if (!req.session.userId || currentTime > sessionExpire) {
         return res.status(401).json({ msg: "Mohon login ke akun Anda!" });
     }
     try {

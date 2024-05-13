@@ -1,16 +1,17 @@
 import express from 'express';
-const router = express.Router();
 
+import { AdminOnly } from '../middleware/AdminMiddleware.js';
 import { setJamById,addWorkDaysToEmployee ,updateJamById, getJamByIdForKaryawan } from '../controllers/JamByIdController.js';
 
+const router = express.Router();
 // Route untuk menetapkan jam kerja berdasarkan ID karyawan
-router.post('/set', setJamById);
+router.post('/set', AdminOnly,setJamById);
 
-router.post('/sethari', addWorkDaysToEmployee)
+router.post('/sethari', AdminOnly,addWorkDaysToEmployee)
 
-router.get('/get/jam', getJamByIdForKaryawan)
+router.get('/get/jam/:id', AdminOnly,getJamByIdForKaryawan)
 
 // Route untuk memperbarui jam kerja berdasarkan ID karyawan
-router.put('/update/:id', updateJamById);
+router.put('/update/:id', AdminOnly,updateJamById);
 
 export default router;

@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "connect-session-sequelize": "^7.1.7",
-    "dayjs": "^1.11.10",
-    "express-session": "^1.18.0",
-    "express-session-sequelize": "^2.3.0"
-  }
-}

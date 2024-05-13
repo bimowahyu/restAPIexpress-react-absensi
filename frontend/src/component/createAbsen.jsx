@@ -253,42 +253,49 @@ const CreateAbsen = () => {
 
   return (
     <div className="clock-container">
-     <div className="gambar">
-      
-      {imageSrc && (
-        <div className="image-container">
-          <img src={imageSrc} className="foto" alt="Captured" height="150px" width="200px" />
-          
+      <div className="gambar">
+        {imageSrc && (
+          <div className="image-container">
+            <img src={imageSrc} className="foto" alt="Captured" />
+          </div>
+        )}
+      </div>
+      <div className="mapsmasuk">
+            <LocationMap latitude={latitude} longitude={longitude} radius={radius}/>
         </div>
-      )}
+      <div className="clockin">
+        
+        <h1>Create Absen</h1>
+      
+        {/* <LocationMap latitude={latitude} longitude={longitude} radius={radius}/> */}
+        <button onClick={takePicture}><IoCamera /> Take Picture</button><br></br>
+        <button onClick={getLocation} className="button is-info"><IoLocationOutline /> Get Location</button><br></br>
+        {latitude !== null && longitude !== null && (
+          <div>
+          <p>Latitude: {latitude}</p>
+          <p>Longitude: {longitude}</p>
+        </div>
+        )}<br></br>
+        <button onClick={createAbsensi} className="button is-success"><IoTimeOutline />Clock In</button>
+      </div>
+      <div className="mapskeluar">
+        <LokasiKeluar latitude={latitudeKeluar} longitude={longitudeKeluar} />
+        </div>
+      <div className="clockout">
+        
+        <h1>Absen Keluar</h1>
+        {/* <LokasiKeluar latitude={latitudeKeluar} longitude={longitudeKeluar} /> */}
+        <button onClick={takePicture}><IoCamera /> Take Picture</button><br></br>
+        <button onClick={getLocationKeluar} className="button is-info"><IoLocationOutline /> Get Location</button><br></br>
+        {latitudeKeluar !== null && longitudeKeluar !== null && (
+         <div>
+         <p>Latitude: {latitudeKeluar}</p>
+         <p>Longitude: {longitudeKeluar}</p>
+       </div>
+        )}<br></br>
+        <button onClick={absenKeluar} className="button is-success"><IoTimeOutline />Clock Out</button>
+      </div>
     </div>
-    <div className="clockin">
-    
-    
-      <h1>Create Absen</h1>
-      {/* <LocationDisplay latitude={latitude} longitude={longitude} /> */}
-      <LocationMap latitude={latitude} longitude={longitude} radius={radius}/>
-      <button onClick={takePicture}><IoCamera /> Take Picture</button><br></br>
-    
-      <button onClick={getLocation} className="button is-info"><IoLocationOutline /> Get Location</button><br></br>
-      {latitude !== null && longitude !== null && (
-        <p>Latitude: {latitude}, Longitude: {longitude}</p>
-      )}<br></br>
-      <button onClick={createAbsensi}  className="button is-success"><IoTimeOutline />Clock In</button>
-    </div>
-    <div className="clockout">
-      <h1>Absen Keluar</h1>
-      <LokasiKeluar latitude={latitudeKeluar} longitude={longitudeKeluar} />
-      <button onClick={takePicture}><IoCamera /> Take Picture</button><br></br>
-      <button onClick={getLocationKeluar} className="button is-info"><IoLocationOutline /> Get Location</button><br></br>
-      {latitudeKeluar !== null && longitudeKeluar !== null && (
-        <p>Latitude: {latitudeKeluar}, Longitude: {longitudeKeluar}</p>
-      )}<br></br>
-      <button onClick={absenKeluar}  className="button is-success"><IoTimeOutline />Clock Out</button>
-     
-    </div>
-   
-  </div>
   );
 };
 

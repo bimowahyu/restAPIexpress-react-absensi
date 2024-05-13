@@ -20,6 +20,7 @@ import AuthAdminRoutes from "./routes/AuthAdminRoutes.js"
 import session from "express-session";
 
 
+
 dotenv.config();
 
 const app = express();
@@ -35,22 +36,37 @@ const store = new sessionStore({
 //    await db.sync();
 // })();
 
+// app.use(session({
+//     secret: process.env.SESS_SECRET,
+//     resave: false,
+//     saveUninitialized: true,
+//     store: store,
+  
+//     cookie: {
+//         secure: 'auto'
+//     }
+// }));
 app.use(session({
     secret: process.env.SESS_SECRET,
     resave: false,
     saveUninitialized: true,
     store: store,
-  
     cookie: {
-        secure: 'auto'
+        secure: 'auto',
+        maxAge: 30 * 60 * 1000 // 30 menit
     }
 }));
+app.use((req, res, next) => {
+    req.session._garbage = Date();
+    req.session.touch();
+    next();
+});
 
 app.use((req, res, next) => {
     res.setHeader('Date', moment().tz('Asia/Jakarta').format('ddd, DD MMM YYYY HH:mm:ss [GMT+0700]'));
     next();
 });
-
+app.use(fileUpload());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -59,6 +75,7 @@ app.use(cors({
     origin:'http://localhost:3000'
 
 }));
+
 
 app.use(express.json());
 app.use(UserRoutes);

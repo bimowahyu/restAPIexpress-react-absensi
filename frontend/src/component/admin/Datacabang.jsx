@@ -1,6 +1,6 @@
 import React,{useState, useEffect} from 'react'
 import axios from 'axios'
-
+import { Link } from 'react-router-dom';
 
   
 
@@ -47,6 +47,7 @@ export const Datacabang = () => {
           <th>Nama Cabang</th>
           <th>Kode Cabang</th>
           <th>Lokasi Kantor</th>
+          <th>Radius Absensi</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -57,10 +58,11 @@ export const Datacabang = () => {
             <td>{cabang.nama_cabang}</td>
             <td>{cabang.kode_cabang}</td>
             <td>{cabang.lokasi_kantor}</td>
+            <td>{cabang.radius} Meter</td>
             <td>
-              {/* <Link to={`/products/edit/${product.uuid}`} className="button is-small is-info">
+              <Link to={`/datacabang/edit/${cabang.id}`} className="button is-small is-info">
                 Edit
-              </Link> */}
+              </Link>
               <button onClick={() => deleteCabang(cabang.id)} className="button is-small is-danger">
                 Delete
               </button>

@@ -5,19 +5,49 @@ import Cabang from '../models/Cabang.js';
 import Users from '../models/Users.js';
 import argon2 from "argon2";
 import { writeFile } from 'fs/promises';
+import fs from 'fs'
+import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 
 // Handler untuk menampilkan daftar karyawan
+// export const GetKaryawan = async (req, res) => {
+//     try {
+//         let data = Karyawan.findAll();
+//         include: [Department, Cabang] 
+//         if (req.query.nama_lengkap) {
+//             data = data.where('nama_lengkap', { [Op.iLike]: `%${req.query.nama_lengkap}%` });
+//         }
+//         if (req.query.department_id) {
+//             // Pastikan department_id tidak undefined sebelum digunakan
+//             if (req.query.department_id !== undefined) {
+//                 data = data.where('department_id', req.query.department_id);
+//             }
+//         }
+//         if (req.query.cabang_id) {
+//             data = data.where('cabang_id', req.query.cabang_id);
+//         }
+
+//         const karyawan = await data;
+//         const department = await Department.findAll();
+//         const cabang = await Cabang.findAll();
+        
+//         res.status(200).json({ karyawan, department, cabang });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({msg:"Internal Server Error"});
+//     }
+// };
 export const GetKaryawan = async (req, res) => {
     try {
-        let data = Karyawan.findAll();
+        let data = await Karyawan.findAll({
+            include: [Department, Cabang] // Include Department and Cabang models
+        });
 
         if (req.query.nama_lengkap) {
             data = data.where('nama_lengkap', { [Op.iLike]: `%${req.query.nama_lengkap}%` });
         }
         if (req.query.department_id) {
-            // Pastikan department_id tidak undefined sebelum digunakan
             if (req.query.department_id !== undefined) {
                 data = data.where('department_id', req.query.department_id);
             }
@@ -27,10 +57,8 @@ export const GetKaryawan = async (req, res) => {
         }
 
         const karyawan = await data;
-        const department = await Department.findAll();
-        const cabang = await Cabang.findAll();
         
-        res.status(200).json({ karyawan, department, cabang });
+        res.status(200).json({ karyawan });
     } catch (error) {
         console.error(error);
         res.status(500).json({msg:"Internal Server Error"});
@@ -56,42 +84,93 @@ export const getKaryawanByid = async (req, res) => {
 
 }
 
-// Handler untuk menambahkan karyawan baru
 export const createKaryawan = async (req, res) => {
-    try {
-        console.log(req.body); // Tambahkan ini untuk memeriksa payload permintaan
-        const { nik, nama_lengkap, jabatan, DepartmentId, CabangId, no_telp, password } = req.body;
-
-        let avatar = '';
-        if (req.file) {
-            const extension = req.file.originalname.split('.').pop();
-            avatar = `${uuidv4()}.${extension}`;
-            await writeFile(`public/uploads/karyawan/${avatar}`, req.file.buffer);
-        }
-
-        const hashedPassword = await argon2.hash(password);
-
-        const createData = await Karyawan.create({
-            nik,
-            nama_lengkap,
-            jabatan,
-            DepartmentId,
-            CabangId,
-            no_telp,
-            avatar,
-            password: hashedPassword
-        });
-
-        if (createData) {
-            res.status(200).json(createData);
-        } else {
-            res.status(500).json({ msg: "Data Karyawan gagal ditambah, cek kembali"});
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({msg:"Internal Server Error"});
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({ msg: "No File Uploaded" });
     }
+
+    const { nik, nama_lengkap, jabatan, DepartmentId, CabangId, no_telp, password } = req.body;
+    const file = req.files.file;
+
+    if (!file) {
+        return res.status(400).json({ msg: "No File Uploaded" });
+    }
+
+    const fileSize = file.data.length;
+    const ext = path.extname(file.name);
+    const fileName = `${nama_lengkap}-${Date.now()}${ext}`;
+    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+    const allowedType = ['.png', '.jpg', '.jpeg'];
+
+    if (!allowedType.includes(ext.toLowerCase())) {
+        return res.status(422).json({ msg: "Invalid Images" });
+    }
+
+    if (fileSize > 5000000) {
+        return res.status(422).json({ msg: "Image must be less than 5 MB" });
+    }
+
+    file.mv(`./public/uploads/karyawan/${fileName}`, async (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ msg: "Failed to upload file" });
+        }
+        try {
+            const hashedPassword = await argon2.hash(password);
+            await Karyawan.create({
+                nik,
+                nama_lengkap,
+                jabatan,
+                DepartmentId,
+                CabangId,
+                no_telp,
+                url:url,
+                avatar: fileName,
+                password: hashedPassword
+            });
+            res.status(201).json({ msg: "karyawan dibuat" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: "Failed to create karyawan" });
+        }
+    });
 };
+// Handler untuk menambahkan karyawan baru
+// export const createKaryawan = async (req, res) => {
+//     try {
+//         console.log(req.body); // Tambahkan ini untuk memeriksa payload permintaan
+//         const { nik, nama_lengkap, jabatan, DepartmentId, CabangId, no_telp, password } = req.body;
+
+//         let avatar = '';
+//         if (req.file) {
+//             const extension = req.file.originalname.split('.').pop();
+//             avatar = `${uuidv4()}.${extension}`;
+//             await writeFile(`public/uploads/karyawan/${avatar}`, req.file.buffer);
+//         }
+
+//         const hashedPassword = await argon2.hash(password);
+
+//         const createData = await Karyawan.create({
+//             nik,
+//             nama_lengkap,
+//             jabatan,
+//             DepartmentId,
+//             CabangId,
+//             no_telp,
+//             avatar,
+//             password: hashedPassword
+//         });
+
+//         if (createData) {
+//             res.status(200).json(createData);
+//         } else {
+//             res.status(500).json({ msg: "Data Karyawan gagal ditambah, cek kembali"});
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({msg:"Internal Server Error"});
+//     }
+// };
 // Handler untuk memperbarui data karyawan
 // export const updateKaryawan = async (req, res) => {
 //     try {

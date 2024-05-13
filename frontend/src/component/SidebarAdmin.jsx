@@ -3,7 +3,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { IoStorefrontOutline, IoPerson, IoPricetag, IoHome, IoLogOut } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { LogOut, reset } from "../fitur/AuthSlice";
-import axios from "axios";
+//import axios from "axios";
+// import "../app/Side.css"
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar" style={{ backgroundColor: "#505160", color: "white" ,position:"fixed"}}>
+    <div>
+         <aside className="menu pl-2 has-shadow bg-grey">
+    {/* <div className="sidebar" style={{ backgroundColor: "#505160", color: "white" ,position:"fixed"}}> */}
+    <div className="sidebar" 
+    style={{ 
+    position: "fixed", top: 70, bottom: 50, left: 0, width: "200px", overflowY: "auto" }}>
       <ul className="menu-list">
         <li>
           <NavLink to="/DashboardAdmin"><IoHome />Dashboard</NavLink>
@@ -37,7 +43,7 @@ const Sidebar = () => {
           <NavLink to="/department/tambah"><IoStorefrontOutline/>Tambah Data Department</NavLink>
         </li>
         <li>
-          <NavLink to="/karyawan"><IoPerson />Data Karyawan</NavLink>
+          <NavLink to="/datakaryawan"><IoPerson />Data Karyawan</NavLink>
         </li>
         <li>
           <NavLink to="/karyawan/tambah"><IoPerson />Tambah Data Karyawan</NavLink>
@@ -64,6 +70,8 @@ const Sidebar = () => {
           </button>
         </li>
       </ul>
+    </div>
+    </aside>
     </div>
   );
 };

@@ -57,6 +57,8 @@ const DashboardAdmin = () => {
 
 
   return (
+    <div>
+      <div className="chart">
     <div style={{ position: "relative" }}>
     <h1>Jumlah Karyawan</h1>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -76,16 +78,18 @@ const DashboardAdmin = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      
       <div>
         <h2>Data Absensi Bulan Ini</h2>
         <AbsensiChart />
       </div>
-     
+     </div>
     </div>
     <div>
         <h2>Data Absensi Bulan Ini</h2>
         <AbsensiDetail />
       </div>
+  </div>
   </div>
 );
 };

@@ -26,13 +26,14 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:5000/cabang/3
+PUT http://localhost:5000/cabang/4
 Content-Type: application/json
 
 {
-"kode_cabang": "02",
-"nama_cabang": "testcabang",
-"lokasi_kantor": "-7.0036053,110.4515652",
+"kode_cabang": "04",
+  "nama_cabang": "testupdate",
+    "latitude": -7.0036053,
+    "longitude": 110.4515652,
 "radius": "100"
 }
 
@@ -60,19 +61,28 @@ Content-Type: application/json
       "nama_department": "test"
 }
 
+###
+PUT http://localhost:5000/department/3
+Content-Type: application/json
+
+{
+     "kode_department": "111",
+      "nama_department": "testedit"
+}
+
 
 ###
 POST  http://localhost:5000/karyawan/
 Content-Type: application/json
 
 {
-            "nik":"3333333333",
+            "nik":"11121212121212",
             "nama_lengkap" : "testmidleware",
             "jabatan" : "test",
             "DepartmentId": "1",
             "CabangId": "2",
             "no_telp": "1234567890",
-            "avatar": "",
+            "avatar": "data.png",
             "password": "test123"
 }
 
@@ -115,7 +125,7 @@ Content-Type: application/json
           
 }
 ###
-GET  http://localhost:5000/karyawan/1
+GET  http://localhost:5000/karyawan/
 
 
 ###
@@ -124,6 +134,10 @@ GET http://localhost:5000/department/1
 
 ###
 GET  http://localhost:5000/cabang
+
+
+###
+GET http://localhost/get/jam/1
 
 ###
 GET  http://localhost:5000/admin/jamKerja
@@ -184,9 +198,9 @@ Content-Type: application/json
 {
     
     "tgl_izin": "2024-03-24",
-    "status": "i",
+    "status": "s",
     "keterangan": "test",
-    "status_approved":"0",
+    "status_approved": "0",
     "foto":"",
     "KaryawanId":"1"
 
@@ -294,7 +308,13 @@ GET http://localhost:5000/absensibulanini/get?bulan=04&tahun=2024
 ###
 GET  http://localhost:5000/absensitotal/get?bulan=04&tahun=2024
 
+###
+PUT http://localhost:5000/izin/2
+Content-Type: application/json
 
+{
+   "status_approved" : "2"
+}
 //praktikum
 
 ###
@@ -325,3 +345,25 @@ Content-Type: application/json
 
     "courier": "jne"
 }
+
+
+
+
+###
+GET https://restcountries.com/v3.1/alpha?codes=170,no,est,pe
+
+###
+GET https://openlibrary.org/search.json?q=the+lord+of+the+rings
+
+###
+GET https://freegeoip.app/json/
+
+###
+GET https://visual-crossing-weather.p.rapidapi.com/forecast?aggregateHours=24&location=Washington,DC,USA&contentType=json&unitGroup=us
+X-RapidAPI-Key: ae9f9576d2mshbd46aafbda9e788p154372jsn197f95280a36
+X-RapidAPI-Host: visual-crossing-weather.p.rapidapi.com
+
+###
+GET https://wft-geo-db.p.rapidapi.com/v1/geo/adminDivisions?id=3386644
+X-RapidAPI-Key: ae9f9576d2mshbd46aafbda9e788p154372jsn197f95280a36
+X-RapidAPI-Host: wft-geo-db.p.rapidapi.com

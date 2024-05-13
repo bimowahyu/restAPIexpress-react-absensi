@@ -32,8 +32,31 @@
 .clock-container {
     display: flex;
 }
-
-.gambar{
+/* CSS */
+.image-container {
+    display: flex;
+    justify-content: center; /* Posisikan gambar di tengah secara horizontal */
+  }
+  
+  .foto {
+    max-width: 100%; /* Gambar tidak akan melebihi lebar parent */
+    height: auto; /* Tinggi gambar menyesuaikan proporsi */
+    max-height: 300px; /* Batasi tinggi gambar untuk menghindari perubahan proporsi yang besar */
+  }
+  
+  /* Tampilan di bawah 600px */
+  @media screen and (max-width: 550px) {
+    .image-container {
+      width: 100%; /* Gambar akan memenuhi lebar parent pada layar kecil */
+    }
+  
+    .foto {
+      width: 100%; /* Gambar akan memenuhi lebar parent pada layar kecil */
+      max-height: none; /* Hapus batasan tinggi gambar */
+    }
+  }
+  
+/* .gambar{
     display: block;
     align-items: center;
 }
@@ -43,11 +66,16 @@
     left: 23rem;
 }
 
+.gambar img,
+.foto img {
+    max-width: 100%; /* Gambar dan foto tidak akan melebihi lebar parent */
+    
+
 .clock-container .clockin,
 .clock-container .clockout {
     flex: 1;
     margin-right: 20px;
-    padding-top: 200px; /* Jarak antara clockin dan clockout */
+    padding-top: 200px;
 }
 /* Tampilan di bawah 600px */
 @media screen and (max-width: 550px) {
