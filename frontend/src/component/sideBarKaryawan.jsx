@@ -64,6 +64,9 @@ const Sidebar = () => {
                 <div>Loading...</div>
             )}
         <ul className="menu-list">
+        <li>
+            <NavLink to="/dashboard"><IoHome />Dashboard</NavLink>
+          </li>
           <li>
             <NavLink to="/createAbsen"><IoHome />Create Absen</NavLink>
           </li>

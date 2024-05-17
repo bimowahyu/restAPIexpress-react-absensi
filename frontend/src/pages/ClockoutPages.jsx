@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import CreateAbsen from '../component/createAbsen'
-import Layout from './layout'
+import ClockOut from "../component/ClockOut";
+// import Layout from './layout'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../fitur/AuthKaryawan";
 
-export const CreateAbsenPages = () => {
+export const ClockOutPages = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { isError } = useSelector((state) => state.auth);
@@ -21,8 +21,8 @@ export const CreateAbsenPages = () => {
     }, [isError, navigate]);
   
   return (
-   
-    <CreateAbsen />
+  
+    <ClockOut />
   
   )
 }

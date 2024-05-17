@@ -1,10 +1,12 @@
 import express from 'express';
-import { index, createJam, updateJam,destroy ,set }from '../controllers/JamController.js';
+import { getAll, createJam, updateJam,destroy ,set,GetJamById }from '../controllers/JamController.js';
 
 const router = express.Router();
 
 // Route untuk menampilkan semua jam kerja
-router.get('/admin/jamKerja', index);
+router.get('/admin/jamKerja', getAll);
+
+router.get('/admin/jamKerja/:id', GetJamById);
 
 // Route untuk menambahkan jam kerja baru
 router.post('/admin/jamKerja', createJam);

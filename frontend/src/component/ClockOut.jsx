@@ -3,17 +3,16 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; 
 import moment from 'moment-timezone'; 
-import LocationDisplay from './location';
-import LokasiKeluar from './lokasikeluar';
-import LocationMap from './locationMaps';
-import { IoLocationOutline, IoCamera ,IoTimeOutline} from "react-icons/io5";
 import { Container, Card, CardContent, Typography, Grid, Button } from '@mui/material';
+import LokasiKeluar from './lokasikeluar';
+import "../app/Side.css"
+import { IoLocationOutline, IoCamera ,IoTimeOutline} from "react-icons/io5";
 import { getMe } from '../fitur/AuthKaryawan';
-// import "../app/Side.css"
+
 
 // import Layout from '../pages/layout';
 
-const CreateAbsen = () => {
+const ClockOut = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -103,53 +102,53 @@ const CreateAbsen = () => {
     }
   };
 
-  const getTodayDateWithTimeZone = () => {
-    return moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
-  };
+//   const getTodayDateWithTimeZone = () => {
+//     return moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
+//   };
 
-  const compareDatesWithSameTimeZone = (date1, date2) => {
-    return moment(date1).isSame(date2, 'day');
-  };
+//   const compareDatesWithSameTimeZone = (date1, date2) => {
+//     return moment(date1).isSame(date2, 'day');
+//   };
 
-  const createAbsensi = async () => {
-    try {
-      if (!latitude || !longitude || !imageSrc) {
-        return alert('Please capture image and get location before creating absensi.');
-      }
+//   const createAbsensi = async () => {
+//     try {
+//       if (!latitude || !longitude || !imageSrc) {
+//         return alert('Please capture image and get location before creating absensi.');
+//       }
   
-      const todayDate = getTodayDateWithTimeZone();
+//       const todayDate = getTodayDateWithTimeZone();
   
-      if (!existingAbsensi) {
-        // Lakukan fetch untuk mendapatkan data absensi terbaru jika existingAbsensi belum diinisialisasi
-        await fetchExistingAbsensi();
-      }
+//       if (!existingAbsensi) {
+//         // Lakukan fetch untuk mendapatkan data absensi terbaru jika existingAbsensi belum diinisialisasi
+//         await fetchExistingAbsensi();
+//       }
   
-      if (existingAbsensi && compareDatesWithSameTimeZone(todayDate, existingAbsensi.tgl_absensi) && existingAbsensi.cek === 1) {
-        return alert('Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.');
-      }
+//       if (existingAbsensi && compareDatesWithSameTimeZone(todayDate, existingAbsensi.tgl_absensi) && existingAbsensi.cek === 1) {
+//         return alert('Anda sudah melakukan absen masuk hari ini. Tunggu hingga tanggal berikutnya untuk melakukan absen masuk.');
+//       }
   
-      const response = await axios.post('http://localhost:5000/absensi/karyawan/create', {
-        latitude,
-        longitude,
-        image: imageSrc,
-      });
+//       const response = await axios.post('http://localhost:5000/absensi/karyawan/create', {
+//         latitude,
+//         longitude,
+//         image: imageSrc,
+//       });
   
-      alert(response.data);
+//       alert(response.data);
   
-      navigate('/createabsen');
-    } catch (error) {
-      console.error('Error creating absensi:', error);
-      if (error.response) {
-        alert(error.response.data.msg);
-      } else if (error.request) {
-        console.error('Request failed:', error.request);
-        alert('Request failed. Please try again later.');
-      } else {
-        console.error('Error:', error.message);
-        alert('An error occurred. Please try again later.');
-      }
-    }
-  };
+//       navigate('/CreateAbsen');
+//     } catch (error) {
+//       console.error('Error creating absensi:', error);
+//       if (error.response) {
+//         alert(error.response.data.msg);
+//       } else if (error.request) {
+//         console.error('Request failed:', error.request);
+//         alert('Request failed. Please try again later.');
+//       } else {
+//         console.error('Error:', error.message);
+//         alert('An error occurred. Please try again later.');
+//       }
+//     }
+//   };
   // const absenKeluar = async () => {
   //   try {
   //     if (!latitudeKeluar || !longitudeKeluar || !imageSrc) {
@@ -219,7 +218,7 @@ const CreateAbsen = () => {
   
       alert(response.data); // Tampilkan pesan dari server response
   
-      navigate('/createAbsen');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Error creating absensi:', error);
       if (error.response) {
@@ -267,25 +266,25 @@ const CreateAbsen = () => {
         </Grid>
         <Grid container spacing={2} style={{ marginTop: '20px' }}>
           <Grid item xs={12}>
-            <LokasiKeluar latitude={latitude} longitude={longitude} />
+            <LokasiKeluar latitude={latitudeKeluar} longitude={longitudeKeluar} />
           </Grid>
         </Grid>
-        <Typography variant="h5" style={{ marginTop: '20px', textAlign: 'center' }}>Absen Masuk</Typography>
+        <Typography variant="h5" style={{ marginTop: '20px', textAlign: 'center' }}>Absen Keluar</Typography>
         <Grid container spacing={2} style={{ marginTop: '20px' }}>
           <Grid item xs={12}>
             <Button onClick={takePicture} variant="outlined" fullWidth startIcon={<IoCamera />}>Take Picture</Button>
           </Grid>
           <Grid item xs={12}>
-            <Button onClick={getLocation} variant="outlined" fullWidth startIcon={<IoLocationOutline />}>Get Location</Button>
+            <Button onClick={getLocationKeluar} variant="outlined" fullWidth startIcon={<IoLocationOutline />}>Get Location</Button>
           </Grid>
-          {latitude !== null && longitude !== null && (
+          {latitudeKeluar !== null && longitudeKeluar !== null && (
             <Grid item xs={12}>
-              <Typography variant="body2">Latitude: {latitude}</Typography>
-              <Typography variant="body2">Longitude: {longitude}</Typography>
+              <Typography variant="body2">Latitude: {latitudeKeluar}</Typography>
+              <Typography variant="body2">Longitude: {longitudeKeluar}</Typography>
             </Grid>
           )}
           <Grid item xs={12}>
-            <Button onClick={createAbsensi} variant="contained" color="primary" fullWidth startIcon={<IoTimeOutline />}>Clock In</Button>
+            <Button onClick={absenKeluar} variant="contained" color="primary" fullWidth startIcon={<IoTimeOutline />}>Clock Out</Button>
           </Grid>
         </Grid>
       </CardContent>
@@ -294,4 +293,4 @@ const CreateAbsen = () => {
   );
 };
 
-export default CreateAbsen;
+export default ClockOut;

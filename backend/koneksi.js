@@ -56,6 +56,21 @@ app.use(session({
         maxAge: 30 * 60 * 1000 // 30 menit
     }
 }));
+// Middleware untuk memeriksa aktivitas pengguna
+// const reload = (req, res, next) => {
+//     // Periksa jika sesi pengguna aktif
+//     if (req.session.user) {
+//         // Jika ada aktivitas pengguna, perbarui waktu terakhir akses
+//         req.session.lastAccess = Date.now();
+//         next();
+//     } else {
+//         // Jika tidak ada aktivitas pengguna, arahkan ke halaman login
+//         res.redirect('/loginadmin');
+//     }
+// };
+
+// app.use(reload);
+
 app.use((req, res, next) => {
     req.session._garbage = Date();
     req.session.touch();

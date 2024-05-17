@@ -137,7 +137,10 @@ GET  http://localhost:5000/cabang
 
 
 ###
-GET http://localhost/get/jam/1
+GET http://localhost:5000/get/jam/1
+
+###
+GET http://localhost:5000/admin/jamKerja/1
 
 ###
 GET  http://localhost:5000/admin/jamKerja

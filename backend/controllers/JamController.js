@@ -3,7 +3,7 @@ import JamById from '../models/JamById.js';
 import Karyawan from '../models/Karyawan.js';
 
 // Handler untuk menampilkan semua jam kerja
-export const index = async (req, res) => {
+export const getAll = async (req, res) => {
     try {
         const jam = await Jam.findAll();
         res.status(200).json({ jam });
@@ -14,7 +14,20 @@ export const index = async (req, res) => {
     }
 };
 export const  GetJamById = async (req,res) =>{
-    
+    try {
+        const {id} = req.params;
+        const jam = await Jam.findByPk(id); 
+        if(jam){
+            res.status(200).json(jam)
+        }
+            else{
+                res.status(404).json({msg:"Jam tidak ditemukan" })
+
+            }
+        
+    } catch (error) {
+        console.error(error);{}
+    }
 }
 // Handler untuk menambahkan jam kerja baru
 export const createJam = async (req, res) => {
