@@ -14,6 +14,7 @@ export const Dashboard = () => {
     const [error, setError] = useState(null);
     const [currentTime, setCurrentTime] = useState('');
     const [absensiData, setAbsensiData] = useState(null);
+    const [absensiBulan, setAbsensiBulan] = useState(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -26,7 +27,7 @@ export const Dashboard = () => {
 
         return () => clearInterval(interval);
     }, []);
-
+ 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -36,6 +37,20 @@ export const Dashboard = () => {
                 setError(error.message);
             }
         };
+
+        const fetchAbsenBulan = async () =>{
+            try {
+                const now = new Date();
+                const bulan = now.getMonth() + 1; // Perhatikan bahwa bulan dimulai dari 0, jadi perlu ditambah 1
+                const tahun = now.getFullYear();
+
+                const response = await axios.get(`http://localhost:5000/absensikaryawan/get?bulan=${bulan}&tahun=${tahun}`)
+                setAbsensiBulan(response.data)
+
+            } catch (error) {
+                setError(error.message);
+            }
+        }
 
         const fetchAbsensiHariIni = async () => {
             try {
@@ -48,16 +63,17 @@ export const Dashboard = () => {
 
         fetchProfile();
         fetchAbsensiHariIni();
+        fetchAbsenBulan();
     }, []);
 
     if (error) {
         return <div>Error: {error}</div>;
     }
 
-    if (!dataKaryawan || !absensiData) {
+    if (!dataKaryawan || !absensiData ) {
         return <div>Loading...</div>;
     }
-
+    const totalAbsenBulanIni = absensiBulan ? absensiBulan.length : 0;
     const { absensiHariIni } = absensiData;
     const logout = () => {
         dispatch(LogOut());
@@ -69,14 +85,18 @@ export const Dashboard = () => {
             <Card>
                 <CardContent>
                     {dataKaryawan ? (
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={3}>
-                                <Avatar alt={dataKaryawan.nama_lengkap} src="path-to-avatar-image.jpg" />
-                            </Grid>
-                            <Grid item xs={9}>
-                                <Typography variant="h6">{dataKaryawan.nama_lengkap}</Typography>
-                                <Typography variant="body2">{dataKaryawan.jabatan}</Typography>
-                            </Grid>
+                          <Grid container spacing={2} alignItems="center">
+                          <Grid item xs={3}>
+                            <Avatar 
+                              alt={dataKaryawan.nama_lengkap} 
+                              src={dataKaryawan.url} 
+                              sx={{ width: 100, height: 100 }} // Menentukan ukuran avatar
+                            />
+                          </Grid>
+                          <Grid item xs={9}>
+                            <Typography variant="h6">{dataKaryawan.nama_lengkap}</Typography>
+                            <Typography variant="body2">{dataKaryawan.jabatan}</Typography>
+                          </Grid>
                         </Grid>
                     ) : (
                         <div>Loading...</div>
@@ -138,9 +158,20 @@ export const Dashboard = () => {
                     <Grid container spacing={2} style={{ marginTop: '20px' }}>
                         <Grid item xs={6}>
                             <Card>
-                                <CardContent>
-                                    <Typography variant="body2">Present</Typography>
-                                    <Typography variant="h6">1 day</Typography>
+                            <CardContent>
+                                    <Typography variant="body2">Absensi Bulan Ini</Typography>
+                                    <Typography variant="h6">{totalAbsenBulanIni} Kehadiran</Typography>
+                                    {absensiBulan ? (
+                                        <ul>
+                                            {/* {absensiBulan.map((absen, index) => (
+                                                <li key={index}>
+                                                    {absen.tgl_absensi}: {absen.jam_masuk} - {absen.jam_keluar}
+                                                </li>
+                                            ))} */}
+                                        </ul>
+                                    ) : (
+                                        <Typography variant="body2">Tidak ada data absensi untuk bulan ini.</Typography>
+                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -154,18 +185,18 @@ export const Dashboard = () => {
                         </Grid>
                         <Grid item xs={6}>
                             <Card>
-                                <CardContent>
+                                {/* <CardContent>
                                     <Typography variant="body2">Sick</Typography>
                                     <Typography variant="h6">0 day</Typography>
-                                </CardContent>
+                                </CardContent> */}
                             </Card>
                         </Grid>
                         <Grid item xs={6}>
                             <Card>
-                                <CardContent>
+                                {/* <CardContent>
                                     <Typography variant="body2">Overdue</Typography>
                                     <Typography variant="h6">1 day</Typography>
-                                </CardContent>
+                                </CardContent> */}
                             </Card>
                         </Grid>
                     </Grid>
