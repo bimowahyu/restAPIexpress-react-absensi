@@ -99,7 +99,7 @@ export const createKaryawan = async (req, res) => {
     const fileSize = file.data.length;
     const ext = path.extname(file.name);
     const fileName = `${nama_lengkap}-${Date.now()}${ext}`;
-    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+     const url = `${req.protocol}://${req.get("host")}/uploads/karyawan/${fileName}`;
     const allowedType = ['.png', '.jpg', '.jpeg'];
 
     if (!allowedType.includes(ext.toLowerCase())) {
