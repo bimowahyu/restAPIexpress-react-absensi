@@ -15,6 +15,8 @@ import { AddDepartmentPages } from "./pages/adminpages/AddDepartmentPages";
 import { EditDepartmentPages } from "./pages/adminpages/EditDepartmentPages";
 import { DataKaryawanPages } from "./pages/adminpages/DataKaryawanPages";
 import { CreateKaryawanPages } from "./pages/adminpages/CreateKaryawanPages";
+import { IzinPages } from "./pages/adminpages/IzinPages";
+import { SetPages } from "./pages/adminpages/SetPages";
 
 
 
@@ -37,8 +39,11 @@ function App() {
         <Route path="/DashboardAdmin" element={<Dashboard />} />
         <Route path="/dashboard" element={<DashboardKaryawanPages />}/>
         <Route path="/createabsen" element={<CreateAbsenPages />} />
+        <Route path="/lihatizin" element={<IzinPages />} />
         <Route path="/GetAbsen" element={<GetAbsen />} />
         <Route path="/users" element={<Profile />} />
+        <Route path="/set" element={<SetPages />} />
+
       </Routes>
     </BrowserRouter>
   );
