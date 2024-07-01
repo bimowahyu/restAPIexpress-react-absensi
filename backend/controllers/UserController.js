@@ -47,8 +47,8 @@ export const updateUser = async(req, res) =>{
         await User.update({
             name: name,
             email: email,
-            password: hashPassword,
-            role: role
+            password: hashPassword  
+            // role: role
         },{
             where:{
                 id: user.id
