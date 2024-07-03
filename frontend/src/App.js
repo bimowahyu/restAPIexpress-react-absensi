@@ -17,6 +17,9 @@ import { DataKaryawanPages } from "./pages/adminpages/DataKaryawanPages";
 import { CreateKaryawanPages } from "./pages/adminpages/CreateKaryawanPages";
 import { IzinPages } from "./pages/adminpages/IzinPages";
 import { SetPages } from "./pages/adminpages/SetPages";
+import { DataJamKerjaPages } from "./pages/adminpages/DataJamKerjaPages";
+import { ProfileAdminPages } from "./pages/adminpages/ProfileAdminPages";
+import { EditProfilePages } from "./pages/adminpages/EditProfilePages";
 
 
 
@@ -43,6 +46,9 @@ function App() {
         <Route path="/GetAbsen" element={<GetAbsen />} />
         <Route path="/users" element={<Profile />} />
         <Route path="/set" element={<SetPages />} />
+        <Route path="/jam" element={<DataJamKerjaPages />} />
+        <Route path="/admin" element={<ProfileAdminPages />} />
+        <Route path="/admin/edit/:id" element={<EditProfilePages />} />
 
       </Routes>
     </BrowserRouter>
