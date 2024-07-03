@@ -62,7 +62,7 @@ const Sidebar = () => {
       <p className="menu-label">Settings</p>
       <ul className="menu-list">
         <li>
-          <NavLink to="/users"><IoPerson />Profile</NavLink>
+          <NavLink to="/admin"><IoPerson />Profile</NavLink>
         </li>
         <li>
           <button onClick={logout} className="button is-white">
