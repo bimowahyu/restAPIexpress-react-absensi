@@ -4,7 +4,7 @@ import Karyawan from '../models/Karyawan.js';
 import { Sequelize, fn, literal } from 'sequelize';
 import moment from 'moment';
 
-export const index = async (req, res) => {
+export const dashboard = async (req, res) => {
     try {
         const hariIni = moment().format('YYYY-MM-DD');
         const bulanIni = moment().format('M');
@@ -69,4 +69,4 @@ export const index = async (req, res) => {
     }
 };
 
-//export { index };
+
