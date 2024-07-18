@@ -29,8 +29,8 @@ const ClockOut = () => {
   useEffect(() => {
     const fetchBranchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/cabang'); // Ganti URL dengan endpoint yang sesuai
-        const { radius } = response.data; // asumsikan bahwa nilai radius ada di dalam data cabang yang diterima
+        const response = await axios.get('http://localhost:5000/cabang');
+        const { radius } = response.data; 
         setRadius(radius);
       } catch (error) {
         console.error('Error fetching branch data:', error);
@@ -222,7 +222,7 @@ const ClockOut = () => {
     } catch (error) {
       console.error('Error creating absensi:', error);
       if (error.response) {
-        // Tampilkan pesan kesalahan dari server response
+        
         alert(error.response.data); 
       } else if (error.request) {
         console.error('Request failed:', error.request);
