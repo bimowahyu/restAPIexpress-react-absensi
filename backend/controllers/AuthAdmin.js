@@ -1,4 +1,4 @@
-import Users from "../models/Users.js"; // Pastikan menggunakan huruf kapital di "Users"
+import Users from "../models/Users.js"; 
 import argon2 from "argon2";
 
 export const Login = async (req, res) => {
