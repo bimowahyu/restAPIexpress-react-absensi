@@ -4,7 +4,7 @@ import Department from '../models/Department.js';
 import Cabang from '../models/Cabang.js';
 import Users from '../models/Users.js';
 import argon2 from "argon2";
-import { writeFile } from 'fs/promises';
+import { writeFile,unlink } from 'fs/promises';
 import fs from 'fs'
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -271,14 +271,20 @@ export const updateKaryawan = async (req, res) => {
     }
 };
 
-// Handler untuk menghapus karyawan
 export const destroyKaryawan = async (req, res) => {
     try {
         const { id } = req.params;
         const data = await Karyawan.findByPk(id);
 
-        if (data.avatar) {
-            await writeFile(`public/uploads/karyawan/${data.avatar}`);
+        if (data && data.avatar) {
+            const filePath = `public/uploads/karyawan/${data.avatar}`;
+            try {
+                await unlink(filePath);
+                console.log('Avatar file deleted successfully');
+            } catch (error) {
+                console.error('Error deleting avatar file:', error);
+                return res.status(500).json({ msg: 'Error deleting avatar file' });
+            }
         }
 
         const deleteData = await Karyawan.destroy({
@@ -286,13 +292,13 @@ export const destroyKaryawan = async (req, res) => {
         });
 
         if (deleteData) {
-            res.status(200).json({ msg: "Data Karyawan berhasil dihapus" });
+            res.status(200).json({ msg: 'Data Karyawan berhasil dihapus' });
         } else {
-            res.status(500).json({ msg: "Data Karyawan gagal dihapus, cek kembali" });
+            res.status(500).json({ msg: 'Data Karyawan gagal dihapus, cek kembali' });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: "Internal Server Error" });
+        res.status(500).json({ msg: 'Internal Server Error' });
     }
 };
 
