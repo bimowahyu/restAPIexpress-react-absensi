@@ -105,4 +105,4 @@ app.get('/current-time', (req, res) => {
 });
 
 app.listen(process.env.APP_PORT, ()=> {console.log('test server');});
- export default app
+
