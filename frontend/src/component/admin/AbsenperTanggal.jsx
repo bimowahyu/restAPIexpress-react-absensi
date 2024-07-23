@@ -1,51 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import useSWR from "swr";
+
+const fetcher = (url) => axios.get(url).then(res => res.data);
 
 const AbsenperTanggal = () => {
-  const [absensiData, setAbsensiData] = useState([]);
   const [tanggal, setTanggal] = useState('');
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, [tanggal, bulan, tahun]);
+  const { data, error } = useSWR(
+    `http://localhost:5000/absensibulanini/get?tanggal=${tanggal}&bulan=${bulan}&tahun=${tahun}`, 
+    fetcher,
+    { refreshInterval: 5000 }  // Polling setiap 5 detik
+  );
 
-  const fetchData = async () => {
-    try {
-      // Mengirimkan permintaan ke backend dengan tanggal, bulan, dan tahun yang dipilih
-      const response = await axios.get(`http://localhost:5000/absensibulanini/get?tanggal=${tanggal}&bulan=${bulan}&tahun=${tahun}`);
-      const data = response.data;
+  if (error) return <div>Error loading data</div>;
+  if (!data) return <div>Loading...</div>;
 
-      // Mengonversi data absensi menjadi format yang sesuai untuk ditampilkan di tabel
-      const formattedData = [];
-
-      // Iterasi melalui data absensi
-      Object.keys(data).forEach((karyawanId, index) => {
-        data[karyawanId].forEach((absensi) => {
-          // Mengambil nilai dari setiap absensi
-          const {
-            tanggal,
-            jam_masuk,
-            jam_keluar
-          } = absensi;
-
-          // Menambahkan data absensi ke dalam array formattedData
-          formattedData.push({
-            id: index + 1,
-            karyawan: `Karyawan ${karyawanId}`,
-            tanggal: tanggal,
-            jam_masuk: jam_masuk,
-            jam_keluar: jam_keluar
-          });
-        });
+  const formattedData = [];
+  Object.keys(data).forEach((karyawanId, index) => {
+    data[karyawanId].forEach((absensi) => {
+      const { tanggal, jam_masuk, jam_keluar } = absensi;
+      formattedData.push({
+        id: index + 1,
+        karyawan: `Karyawan ${karyawanId}`,
+        tanggal,
+        jam_masuk,
+        jam_keluar
       });
-
-      setAbsensiData(formattedData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+    });
+  });
 
   return (
     <div>
@@ -89,12 +74,12 @@ const AbsenperTanggal = () => {
           </tr>
         </thead>
         <tbody>
-          {absensiData.map((absensi, index) => (
+          {formattedData.map((absensi, index) => (
             <tr key={absensi.id}>
               <td>{index + 1}</td>
               <td>{absensi.karyawan}</td>
               <td>{absensi.tanggal}</td>
-              <td>{absensi.jam_masuk ? absensi.jam_masuk : "Anda Tidak Presensi Hari Ini"}</td>
+              <td>{absensi.jam_masuk}</td>
               <td>{absensi.jam_keluar ? absensi.jam_keluar : "Belum absen keluar"}</td>
             </tr>
           ))}
