@@ -1,58 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import useSWR from 'swr';
 import axios from 'axios';
 
+const fetcher = (url) => axios.get(url).then(res => res.data);
+
 const AbsensiDetail = () => {
-  const [absensiData, setAbsensiData] = useState([]);
+  const now = new Date();
+  const bulan = now.getMonth() + 1; 
+  const tahun = now.getFullYear();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const now = new Date();
-        const bulan = now.getMonth() + 1; // Perhatikan bahwa bulan dimulai dari 0, jadi perlu ditambah 1
-        const tahun = now.getFullYear();
+  const { data, error } = useSWR(`http://localhost:5000/absensibulanini/get?bulan=${bulan}&tahun=${tahun}`, fetcher, {
+    refreshInterval: 5000 // Polling setiap 5 detik
+  });
 
-        // Mengirimkan permintaan ke backend dengan bulan dan tahun saat ini
-        const response = await axios.get(`http://localhost:5000/absensibulanini/get?bulan=${bulan}&tahun=${tahun}`);
-        const data = response.data;
+  if (error) return <div>Error loading data</div>;
+  if (!data) return <div>Loading...</div>;
 
-        // Mengonversi data absensi menjadi format yang sesuai untuk ditampilkan di tabel
-        const formattedData = [];
+  // Mengonversi data absensi menjadi format yang sesuai untuk ditampilkan di tabel
+  const formattedData = [];
 
-        // Iterasi melalui data absensi
-        Object.keys(data).forEach((karyawanId, index) => {
-          data[karyawanId].forEach((absensi) => {
-            // Mengambil nilai dari setiap absensi
-            const {
-              tanggal,
-              jam_masuk,
-              jam_keluar
-            } = absensi;
-
-            // Menambahkan data absensi ke dalam array formattedData
-            formattedData.push({
-              id: index + 1,
-              karyawan: `Karyawan ${karyawanId}`,
-              tanggal: tanggal,
-              jam_masuk: jam_masuk,
-              jam_keluar: jam_keluar
-            });
-          });
-        });
-
-        setAbsensiData(formattedData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  // Iterasi melalui data absensi
+  data.forEach((karyawanData, karyawanIndex) => {
+    karyawanData.absensi.forEach((absensi, absensiIndex) => {
+      // Menambahkan data absensi ke dalam array formattedData
+      formattedData.push({
+        id: `${karyawanIndex + 1}-${absensiIndex + 1}`,
+        karyawan: karyawanData.nama,
+        tanggal: absensi.tanggal,
+        jam_masuk: absensi.jam_masuk,
+        jam_keluar: absensi.jam_keluar
+      });
+    });
+  });
 
   return (
     <div>
-      {/* <h1 className="title">Data Absen</h1> */}
-      <h2 className="subtitle">Data absen</h2>
-
+      <h2 className="subtitle">Data Absen</h2>
       <table className="table is-striped is-fullwidth">
         <thead>
           <tr>
@@ -64,7 +47,7 @@ const AbsensiDetail = () => {
           </tr>
         </thead>
         <tbody>
-          {absensiData.map((absensi, index) => (
+          {formattedData.map((absensi, index) => (
             <tr key={absensi.id}>
               <td>{index + 1}</td>
               <td>{absensi.karyawan}</td>
