@@ -24,19 +24,19 @@ const currentDay = daysOfWeek[dayIndex];
 export const getAbsensi = async (req, res) => {
     try {
         const hariIni =  moment().tz('Asia/Jakarta').format('YYYY-MM-DD');//new Date().toISOString().slice(0, 10);
-        const karyawanId = req.karyawan.id; // Menggunakan req.karyawan.id
-        const karyawan = await Karyawan.findByPk(karyawanId); // Menggunakan await untuk mendapatkan karyawan berdasarkan ID
+        const karyawanId = req.karyawan.id; 
+        const karyawan = await Karyawan.findByPk(karyawanId); 
 
         if (!karyawan) {
             return res.status(404).json({ msg: "Karyawan tidak ditemukan" });
         }
 
         const absensiHariIni = await Absensi.findOne({ where: { karyawan_id: karyawanId, tgl_absensi: hariIni } });
-        const cek = await Absensi.count({ where: { tgl_absensi: hariIni, karyawan_id: karyawanId } }); // Menggunakan karyawanId
+        const cek = await Absensi.count({ where: { tgl_absensi: hariIni, karyawan_id: karyawanId } }); 
         const lokasi = await Cabang.findByPk(karyawan.CabangId);
-        const jamKerja = await JamById.findOne({ // Menggunakan findOne karena Anda hanya ingin mendapatkan satu data Jam
+        const jamKerja = await JamById.findOne({ 
             where: { 
-                hari: currentDay // Menggunakan dayjs untuk mendapatkan nama hari dalam Bahasa Indonesia
+                hari: currentDay 
             } 
         });
 
@@ -49,14 +49,33 @@ export const getAbsensi = async (req, res) => {
 
 // export const getAbsensiByKaryawanId = async (req, res) => {
 //     try {
-//         const karyawanId = req.karyawanId; // Ambil ID karyawan dari parameter route
+//         const karyawanId = req.karyawanId; 
+        
+//         const bulan = req.query.bulan;
+//         const tahun = req.query.tahun;
+
+//         // Menggunakan moment.js untuk memastikan tanggal yang valid
+//         const tanggalMulai = moment(`${tahun}-${bulan}-01`).format('YYYY-MM-DD');
+//         const tanggalSelesai = moment(`${tahun}-${bulan}-30`).format('YYYY-MM-DD');
         
 //         // Cari data absensi berdasarkan ID karyawan
 //         const absensiKaryawan = await Absensi.findAll({
 //             where: {
-//                 karyawan_id: karyawanId
+//                 karyawan_id: karyawanId,
+//                 tgl_absensi: {
+//                     [Op.between]: [tanggalMulai, tanggalSelesai]
+//                 }
 //             }
 //         });
+//         const kehadiranById = {};
+//         absensiKaryawan.forEach(absensi=> {
+//             const karyawanId = absensi.karyawan_id;
+//             if (!kehadiranById[karyawanId]) {
+//                 kehadiranById[karyawanId] = 1; 
+//             } else {
+//                 kehadiranById[karyawanId]++; 
+//             }
+//         })
 
 //         // Mengirimkan data absensi karyawan dalam format JSON sebagai respons
 //         res.status(200).json(absensiKaryawan);
@@ -66,9 +85,35 @@ export const getAbsensi = async (req, res) => {
 //     }
 // };
 
+export const getAbsensiByKaryawanId = async (req, res) => {
+    try {
+        const karyawanId = req.karyawan.id;
+        const { bulan, tahun } = req.query; 
+
+        // Menggunakan moment.js untuk memastikan tanggal yang valid
+        const tanggalMulai = moment(`${tahun}-${bulan}-01`).startOf('month').format('YYYY-MM-DD');
+        const tanggalSelesai = moment(`${tahun}-${bulan}-01`).endOf('month').format('YYYY-MM-DD');
+        
+        // Cari data absensi berdasarkan ID karyawan
+        const absensiKaryawan = await Absensi.findAll({
+            where: {
+                karyawan_id: karyawanId,
+                tgl_absensi: {
+                    [Op.between]: [tanggalMulai, tanggalSelesai]
+                }
+            }
+        });
+
+        
+        res.status(200).json(absensiKaryawan);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 export const getAbsensiBulanIni = async (req, res) => {
-    try {   
+    try {
         const bulan = req.query.bulan;
         const tahun = req.query.tahun;
 
@@ -82,54 +127,65 @@ export const getAbsensiBulanIni = async (req, res) => {
                 tgl_absensi: {
                     [Op.between]: [tanggalMulai, tanggalSelesai]
                 }
-            }
+            },
+            include: [
+                {
+                    model: Karyawan,
+                    as:'karyawan',
+                    attributes: ['nama_lengkap'] 
+                }
+            ]
         });
 
-        // Membuat objek untuk menyimpan data absensi per karyawan
+        
         const dataAbsensi = {};
 
-        // Mengelompokkan data absensi berdasarkan karyawan
+       
         absensiBulanan.forEach(absensi => {
             const karyawanId = absensi.karyawan_id;
             if (!dataAbsensi[karyawanId]) {
-                dataAbsensi[karyawanId] = []; // Inisialisasi array jika belum ada
+                dataAbsensi[karyawanId] = {
+                    nama: absensi.karyawan ? absensi.karyawan.nama_lengkap : 'Unknown',
+                    absensi: [] 
+                };
             }
-            // Menambahkan data absensi ke dalam array
-            dataAbsensi[karyawanId].push({
+           
+            dataAbsensi[karyawanId].absensi.push({
                 tanggal: absensi.tgl_absensi,
                 jam_masuk: absensi.jam_masuk,
                 foto_masuk: absensi.foto_masuk,
-                foto_keluar:absensi.foto_keluar,
+                foto_keluar: absensi.foto_keluar,
                 jam_keluar: absensi.jam_keluar,
                 lokasi_masuk: absensi.lokasi_masuk,
                 lokasi_keluar: absensi.lokasi_keluar
             });
-            if(!absensi.jam_keluar || !absensi.lokasi_keluar || !absensi.foto_keluar){
-               dataAbsensi[karyawanId].push({error: 'Anda belum absen keluar'})
+
+            if (!absensi.jam_keluar || !absensi.lokasi_keluar || !absensi.foto_keluar) {
+                dataAbsensi[karyawanId].absensi.push({ error: 'Anda belum absen keluar' });
             }
-            if(!absensi.jam_masuk || !absensi.lokasi_masuk || !absensi.foto_masuk){
-                dataAbsensi[karyawanId].push({error: 'Anda Tidak Presensi Hari ini'})
-             }
+            if (!absensi.jam_masuk || !absensi.lokasi_masuk || !absensi.foto_masuk) {
+                dataAbsensi[karyawanId].absensi.push({ error: 'Anda Tidak Presensi Hari ini' });
+            }
         });
 
-        // Mengirimkan data absensi dalam format yang diinginkan
-        res.status(200).json(dataAbsensi);
+       
+        res.status(200).json(Object.values(dataAbsensi));
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
 
 export const getAbsensiTotal = async (req, res) => {
     try {   
         const bulan = req.query.bulan;
         const tahun = req.query.tahun;
 
-        // Menggunakan moment.js untuk memastikan tanggal yang valid
+      
         const tanggalMulai = moment(`${tahun}-${bulan}-01`).format('YYYY-MM-DD');
         const tanggalSelesai = moment(`${tahun}-${bulan}-30`).format('YYYY-MM-DD');
 
-        // Mendapatkan semua data absensi untuk bulan dan tahun yang ditentukan
+        
         const absensiBulanan = await Absensi.findAll({
             where: {
                 tgl_absensi: {
@@ -138,16 +194,16 @@ export const getAbsensiTotal = async (req, res) => {
             }
         });
 
-        // Membuat objek untuk menyimpan jumlah kehadiran setiap karyawan
+        
         const kehadiranKaryawan = {};
 
         // Menghitung jumlah kehadiran setiap karyawan
         absensiBulanan.forEach(absensi => {
             const karyawanId = absensi.karyawan_id;
             if (!kehadiranKaryawan[karyawanId]) {
-                kehadiranKaryawan[karyawanId] = 1; // Jika belum ada, inisialisasi dengan 1
+                kehadiranKaryawan[karyawanId] = 1; 
             } else {
-                kehadiranKaryawan[karyawanId]++; // Jika sudah ada, tambahkan 1
+                kehadiranKaryawan[karyawanId]++; 
             }
         });
 
@@ -160,15 +216,15 @@ export const getAbsensiTotal = async (req, res) => {
 };
 
 function convertToGMT7(dateString) {
-    return moment.utc(dateString).tz('Asia/Jakarta').format(); // Mengubah ke zona waktu Asia/Jakarta (GMT+7)
+    return moment.utc(dateString).tz('Asia/Jakarta').format(); 
 }
 
-// Fungsi untuk membuat objek absensi dengan waktu yang telah disesuaikan
+
 function createAdjustedAbsensi(dataMasuk) {
     return {
         ...dataMasuk,
-        createdAt: convertToGMT7(new Date()), // Mengonversi createdAt ke GMT+7
-        updatedAt: convertToGMT7(new Date()) // Mengonversi updatedAt ke GMT+7
+        createdAt: convertToGMT7(new Date()), 
+        updatedAt: convertToGMT7(new Date()) 
     };
 }
 export const CreateAbsensiKaryawan = async (req, res) => {
