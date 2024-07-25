@@ -22,7 +22,7 @@ export const createIzin = async (req, res) => {
 
         // Jika izin berhasil disimpan
         if (izin) {
-            return res.status(200).json({ msg: 'Berhasil Mengajukan Izin', izin });
+            return res.status(201).json({ msg: 'Berhasil Mengajukan Izin', izin });
         } else {
             return res.status(500).json({ msg: "Gagal Mengajukan Izin" });
         }
