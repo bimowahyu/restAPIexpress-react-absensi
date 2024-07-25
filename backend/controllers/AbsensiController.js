@@ -354,7 +354,7 @@ export const CreateAbsensiKaryawan = async (req, res) => {
         const simpan = await Absensi.create(adjustedDataMasuk);
         if (simpan) {
             await writeFile(file, Buffer.from(imageData, 'base64'));
-            return res.status(200).send("Absensi berhasil, Selamat bekerja");
+            return res.status(201).send("Absensi berhasil, Selamat bekerja");
         } else {
             return res.status(500).send("Error saat menyimpan data absensi");
         }  
