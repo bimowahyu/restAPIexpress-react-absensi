@@ -34,7 +34,7 @@ export const createJam = async (req, res) => {
     try {
         const create = await Jam.create(req.body);
         if (create) {
-            res.status(200).json({msg: 'Jam Kerja berhasil ditambah'});
+            res.status(201).json({msg: 'Jam Kerja berhasil ditambah'});
         } else {
             res.status('404').json({msg:'Jam Kerja gagal ditambah, cek kembali'});
         }
