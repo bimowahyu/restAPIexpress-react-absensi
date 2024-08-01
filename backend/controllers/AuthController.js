@@ -1,4 +1,4 @@
-import Karyawan from "../models/Karyawan.js";// Pastikan menggunakan huruf kapital di "karyawans"
+import Karyawan from "../models/Karyawan.js";
 import argon2 from "argon2";
 
 export const LoginKaryawan = async (req, res) => {
@@ -25,7 +25,7 @@ export const LoginKaryawan = async (req, res) => {
             return res.status(400).json({ msg: "Password salah" });
         }
 
-        // Simpan CabangId dalam sesi karyawan
+        
         req.session.karyawanId = karyawan.id;
         req.session.CabangId = karyawan.CabangId; // Tambahkan baris ini
 
