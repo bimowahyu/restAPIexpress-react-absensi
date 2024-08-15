@@ -1,4 +1,3 @@
-// Import model Karyawan
 import Karyawan from '../models/Karyawan.js';
 import Department from '../models/Department.js';
 import Cabang from '../models/Cabang.js';
