@@ -3,9 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; 
 import moment from 'moment-timezone'; 
-
 import Lokasi from './lokasi';
-
 import { IoLocationOutline, IoCamera ,IoTimeOutline} from "react-icons/io5";
 import { Container, Card, CardContent, Typography, Grid, Button } from '@mui/material';
 
@@ -24,8 +22,8 @@ const CreateAbsen = () => {
   useEffect(() => {
     const fetchBranchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/cabang'); // Ganti URL dengan endpoint yang sesuai
-        const { radius } = response.data; // asumsikan bahwa nilai radius ada di dalam data cabang yang diterima
+        const response = await axios.get('http://localhost:5000/cabang'); 
+        const { radius } = response.data; 
         setRadius(radius);
       } catch (error) {
         console.error('Error fetching branch data:', error);
@@ -72,7 +70,7 @@ const CreateAbsen = () => {
     }
   };
 
-  const getLocationKeluar = () => {
+  const getLocationMasuk = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -145,7 +143,7 @@ const CreateAbsen = () => {
     }
   };
 
-  const absenKeluar = async () => {
+  const absenMasuk = async () => {
     try {
       if (!latitudeKeluar || !longitudeKeluar || !imageSrc) {
         return alert('Please capture image and get location before creating absensi.');
