@@ -47,54 +47,14 @@ export const getAbsensi = async (req, res) => {
     }
 };
 
-// export const getAbsensiByKaryawanId = async (req, res) => {
-//     try {
-//         const karyawanId = req.karyawanId; 
-        
-//         const bulan = req.query.bulan;
-//         const tahun = req.query.tahun;
-
-//         // Menggunakan moment.js untuk memastikan tanggal yang valid
-//         const tanggalMulai = moment(`${tahun}-${bulan}-01`).format('YYYY-MM-DD');
-//         const tanggalSelesai = moment(`${tahun}-${bulan}-30`).format('YYYY-MM-DD');
-        
-//         // Cari data absensi berdasarkan ID karyawan
-//         const absensiKaryawan = await Absensi.findAll({
-//             where: {
-//                 karyawan_id: karyawanId,
-//                 tgl_absensi: {
-//                     [Op.between]: [tanggalMulai, tanggalSelesai]
-//                 }
-//             }
-//         });
-//         const kehadiranById = {};
-//         absensiKaryawan.forEach(absensi=> {
-//             const karyawanId = absensi.karyawan_id;
-//             if (!kehadiranById[karyawanId]) {
-//                 kehadiranById[karyawanId] = 1; 
-//             } else {
-//                 kehadiranById[karyawanId]++; 
-//             }
-//         })
-
-//         // Mengirimkan data absensi karyawan dalam format JSON sebagai respons
-//         res.status(200).json(absensiKaryawan);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Internal Server Error');
-//     }
-// };
 
 export const getAbsensiByKaryawanId = async (req, res) => {
     try {
         const karyawanId = req.karyawan.id;
         const { bulan, tahun } = req.query; 
-
-        // Menggunakan moment.js untuk memastikan tanggal yang valid
         const tanggalMulai = moment(`${tahun}-${bulan}-01`).startOf('month').format('YYYY-MM-DD');
         const tanggalSelesai = moment(`${tahun}-${bulan}-01`).endOf('month').format('YYYY-MM-DD');
         
-        // Cari data absensi berdasarkan ID karyawan
         const absensiKaryawan = await Absensi.findAll({
             where: {
                 karyawan_id: karyawanId,
@@ -131,25 +91,30 @@ export const getAbsensiBulanIni = async (req, res) => {
             include: [
                 {
                     model: Karyawan,
-                    as:'karyawan',
-                    attributes: ['nama_lengkap'] 
+                    as: 'karyawan',
+                    attributes: ['nama_lengkap'],
+                    include: [
+                        {
+                            model: Cabang,
+                            attributes: ['nama_cabang'] // Menyertakan nama cabang
+                        }
+                    ]
                 }
             ]
         });
 
-        
         const dataAbsensi = {};
 
-       
         absensiBulanan.forEach(absensi => {
             const karyawanId = absensi.karyawan_id;
             if (!dataAbsensi[karyawanId]) {
                 dataAbsensi[karyawanId] = {
                     nama: absensi.karyawan ? absensi.karyawan.nama_lengkap : 'Unknown',
-                    absensi: [] 
+                    cabang: absensi.karyawan && absensi.karyawan.Cabang ? absensi.karyawan.Cabang.nama_cabang : 'Unknown', // Menyertakan nama cabang
+                    absensi: []
                 };
             }
-           
+
             dataAbsensi[karyawanId].absensi.push({
                 tanggal: absensi.tgl_absensi,
                 jam_masuk: absensi.jam_masuk,
@@ -168,7 +133,7 @@ export const getAbsensiBulanIni = async (req, res) => {
             }
         });
 
-       
+      
         res.status(200).json(Object.values(dataAbsensi));
     } catch (error) {
         console.error(error);
@@ -196,8 +161,6 @@ export const getAbsensiTotal = async (req, res) => {
 
         
         const kehadiranKaryawan = {};
-
-        // Menghitung jumlah kehadiran setiap karyawan
         absensiBulanan.forEach(absensi => {
             const karyawanId = absensi.karyawan_id;
             if (!kehadiranKaryawan[karyawanId]) {
@@ -206,8 +169,6 @@ export const getAbsensiTotal = async (req, res) => {
                 kehadiranKaryawan[karyawanId]++; 
             }
         });
-
-        // Mengirimkan data kehadiran dalam format yang diinginkan
         res.status(200).json(kehadiranKaryawan);
     } catch (error) {
         console.error(error);
@@ -247,8 +208,6 @@ export const CreateAbsensiKaryawan = async (req, res) => {
         //const tglAbsensi = dayjs().format('YYYY-MM-DD');
         // const tglAbsensi = req.body;
 
-
-        // Periksa apakah sudah ada absensi masuk untuk karyawan pada hari yang sama
         // const existingAbsensi = await Absensi.findOne({ where: { tgl_absensi: tglAbsensi, karyawan_id: karyawan.id } });
 
         // if (existingAbsensi) {
@@ -455,28 +414,6 @@ const setJamKeluar = moment(`${tglAbsensi} ${jamKerja.jamDetail.set_jamPulang}`,
 if (jam.isBefore(setJamKeluar)) {
     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
 }
-
-         
-        //  if (jam > jamKerja.jamDetail.set_jamPulang) {
-        //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
-        // }
-        // console.log(jamKerja)
-        // if (jam < jamKerja.jamDetail.set_jamKeluar || jam < jamKerja.jamDetail.set_jamKeluar) {
-        //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar");
-        // }
-//                Periksa apakah sudah waktunya untuk absen keluar
-               // const jam = moment().format('HH:mm:ss');
-                // const setJamKeluar = moment(`${tglAbsensi} ${jamKerja.jamDetail.set_jamPulang}`, 'YYYY-MM-DD HH:mm:ss');
-                // if (jam.isBefore(setJamKeluar)) {
-                //     return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar.");
-                // }
-        
-      
-        //  const currentTime = new Date().toLocaleTimeString("en-US", { hour12: false });
-        //  if (currentTime < jamKerja.awal_jamKeluar || currentTime > jamKerja.set_jamPulang) {
-        //      return res.status(400).send("Maaf, belum waktunya melakukan absensi keluar atau Anda sudah melewati batas waktu absensi keluar");
-        //  }
-
        const formatName = `${karyawan.nik}-${tglAbsensi}-keluar`;
        const [imageType, imageData] = req.body.image.split(";base64,");
        const file = `public/uploads/absensi/${formatName}.png`;
