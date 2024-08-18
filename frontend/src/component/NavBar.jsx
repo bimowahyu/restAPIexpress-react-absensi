@@ -13,24 +13,29 @@ const NavBar = () => {
   const { user } = useSelector((state) => state.auth);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get('http://localhost:5000/Me');
         setDataAdmin(response.data);
       } catch (error) {
         setError(error.message);
+        if (error.response && error.response.status === 401) {
+          dispatch(LogOut());
+          navigate("/loginadmin");
+        }
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [dispatch, navigate]);
 
   const logout = () =>{
     dispatch(LogOut());
     dispatch(reset());
     navigate("/loginadmin");
   }
+
 
   return (
     <div>
