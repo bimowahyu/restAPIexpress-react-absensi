@@ -6,7 +6,12 @@ export const getUsers = async(req, res) =>{
         const response = await User.findAll({
             attributes:['id','name','email','role']
         });
-        res.status(200).json(response);
+        // res.status(200).json(response);
+          res.status(200).json({
+            status: 200,
+            message: 'Success get all data',
+            data: response
+        });
     } catch (error) {
         res.status(500).json({msg: error.message});
     }
